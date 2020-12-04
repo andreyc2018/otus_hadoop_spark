@@ -1,4 +1,4 @@
 #  Экосистема Hadoop, Spark, Hive
 
-https://otus.ru/learning/83924/
+[Course home page](https://otus.ru/learning/83924/)
 
