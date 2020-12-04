@@ -1,3 +1,4 @@
+import scala.collection.immutable
 import scala.io.Source
 
 object TennisEtlApp extends App {
@@ -30,12 +31,14 @@ object TennisEtlApp extends App {
 
   val head :: records = source.getLines.toList
   val headers = parseHeaders(head)
-  val matches = records.map(parseLine(_, headers))
+  val matches: immutable.Seq[TennisMatch] = records.map(parseLine(_, headers))
 
-  def filterRecords(playerName: String, month: Int)(records: Iterable[TennisMatch]): Unit = {
+  def filterRecords(playerName: String, month: Int)(records: Iterable[TennisMatch]) = {
     records.filter(record =>
-      (record.loserName == playerName || record.winnerName == playerName) && record.date.month == month)
+      (record.loserName == playerName || record.winnerName == playerName)
+        && record.date.month == month
+    )
   }
-  println(matches.take(5).mkString("\n"))
-  println(filterRecords("Daniil Medevedev", 5)(matches).mkString("\n"))
+//  println(matches.take(5).mkString("\n"))
+  println(filterRecords("Daniil Medvedev", 10)(matches).mkString("\n"))
 }
