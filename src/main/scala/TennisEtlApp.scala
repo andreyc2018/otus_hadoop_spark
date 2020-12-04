@@ -39,6 +39,18 @@ object TennisEtlApp extends App {
         && record.date.month == month
     )
   }
+
+  def renderRecord(playerName: String)(record: TennisMatch) = {
+    record match {
+      case TennisMatch(tourneyName, winnerName, loserName, _)
+        if loserName == playerName => List(tourneyName, winnerName, "L").mkString(",")
+      case TennisMatch(tourneyName, winnerName, loserName, _)
+        if winnerName == playerName => List(tourneyName, loserName, "W").mkString(",")
+    }
+  }
 //  println(matches.take(5).mkString("\n"))
-  println(filterRecords("Daniil Medvedev", 10)(matches).mkString("\n"))
+//  println(filterRecords("Daniil Medvedev", 10)(matches).mkString("\n"))
+
+  println(renderRecord("Daniil Medvedev")
+    (filterRecords("Daniil Medvedev", 10)(matches).head))
 }
