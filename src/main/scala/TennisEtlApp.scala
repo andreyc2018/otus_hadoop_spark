@@ -1,3 +1,4 @@
+import java.io.PrintWriter
 import scala.collection.immutable
 import scala.io.Source
 
@@ -49,10 +50,27 @@ object TennisEtlApp extends App {
     }
   }
 
+  def writeToFile(fileName: String, playerName: String, month: Int) = {
+    val dataToWrite =
+      filterRecords(playerName, month)(matches)
+        .map(renderRecord(playerName))
+        .mkString("\n")
+
+    val writer = new PrintWriter(fileName)
+    writer.println(dataToWrite)
+    writer.flush()
+    writer.close()
+  }
+
+  val playerName = args(0)
+  val month = args(1).toInt
+  val outFile = args(2)
+
+  writeToFile(outFile, playerName, month)
 //  println(matches.take(5).mkString("\n"))
 //  println(filterRecords("Daniil Medvedev", 10)(matches).mkString("\n"))
 
-  val firstRecord = filterRecords("Daniil Medvedev", 10)(matches).head
-  val rendered = renderRecord("Daniil Medvedev")(firstRecord)
-  println(rendered)
+//  val firstRecord = filterRecords("Daniil Medvedev", 10)(matches).head
+//  val rendered = renderRecord("Daniil Medvedev")(firstRecord)
+//  println(rendered)
 }
