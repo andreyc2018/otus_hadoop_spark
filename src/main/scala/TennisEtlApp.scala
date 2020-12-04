@@ -48,9 +48,11 @@ object TennisEtlApp extends App {
         if winnerName == playerName => List(tourneyName, loserName, "W").mkString(",")
     }
   }
+
 //  println(matches.take(5).mkString("\n"))
 //  println(filterRecords("Daniil Medvedev", 10)(matches).mkString("\n"))
 
-  println(renderRecord("Daniil Medvedev")
-    (filterRecords("Daniil Medvedev", 10)(matches).head))
+  val firstRecord = filterRecords("Daniil Medvedev", 10)(matches).head
+  val rendered = renderRecord("Daniil Medvedev")(firstRecord)
+  println(rendered)
 }
