@@ -14,27 +14,48 @@ object CountriesApp extends App {
 //    "https://raw.githubusercontent.com/mledoze/countries/master/countries.json"
 //  )
 
-//  def source = Source.fromFile(
-//    "/home/andrey/Projects/learning/otus/otus_hadoop_spark/lesson_2/home_work/data/countries_short.json"
-//  )
-
   def source = Source.fromFile(
+    "/home/andrey/Projects/learning/otus/otus_hadoop_spark/lesson_2/home_work/data/countries_short.json"
+  )
+  case class Country(name: String, capital: String, region: String, area: Int)
+
+  implicit val reads: Reads[Country] = (
+    (__ \ "name" \ "common").read[String] and
+      (__ \ "capital" \ 0).read[String] and
+      (__ \ "region").read[String] and
+      (__ \ "area").read[Int]
+  )(Country)
+
+  val countriesJson = Json.parse(source.mkString(""))
+
+  val countriesValidated = countriesJson.validate[List[Country]]
+
+  val countriesList = countriesValidated match {
+    case JsSuccess(list: List[Country], _) => list
+    case e: JsError => {
+      List()
+    }
+  }
+
+  println(countriesList.filter(_.region contains "Africa"))
+
+  def test_source = Source.fromFile(
     "/home/andrey/Projects/learning/otus/otus_hadoop_spark/lesson_2/home_work/data/test.json"
   )
   case class FileName(size: String, datecreated: String, id: String, contenttype: String, filename: String)
 
-  implicit val fileReads: Reads[FileName] = (
+  implicit val test_reads: Reads[FileName] = (
     (__ \ "size").read[String] and
       (__ \ "date-created").read[String] and
       (__ \ "id").read[String] and
-      (__ \ "content-type").read[String] and
-      (__ \ "filename").read[String]
+      (__ \ "content-type" \ 0).read[String] and
+      (__ \ "filename" \ "common").read[String]
     )(FileName)
 
-  val json: JsValue = Json.parse(source.mkString(""))
+  val test_json: JsValue = Json.parse(test_source.mkString(""))
 
-  val nameResult = json.validate[List[FileName]]
-  println(nameResult)
+  val nameResult = test_json.validate[List[FileName]]
+//  println(nameResult)
 
   val list = nameResult match {
     case JsSuccess(list : List[FileName], _) => list
