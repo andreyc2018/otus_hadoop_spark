@@ -1,0 +1,6 @@
+# vim: filetype=sh
+alias hls='hadoop fs -ls'
+alias hrm='hadoop fs -rm -skipTrash'
+alias hcat='hadoop fs -cat'
+alias hmkdir='hadoop fs -mkdir'
+
