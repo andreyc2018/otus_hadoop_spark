@@ -15,5 +15,5 @@ file="$1"
 [ -z "$file" ] && barf 1 "using: ${0##*/} <file>"
 
 echo "Sending "$file" to hadoop vm"
-scp "$file" hadoop:~/projects/
+scp "$file" "$HADOOP_SSH":~/projects/
 
