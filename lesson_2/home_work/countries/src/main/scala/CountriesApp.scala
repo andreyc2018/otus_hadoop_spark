@@ -12,9 +12,6 @@ object CountriesApp extends App {
     "https://raw.githubusercontent.com/mledoze/countries/master/countries.json"
   )
 
-//  def source = Source.fromFile(
-//    "/home/andrey/Projects/learning/otus/otus_hadoop_spark/lesson_2/home_work/data/countries_short.json"
-//  )
   case class Country(name: String, capital: String, region: String, area: Float)
 
   implicit val reads: Reads[Country] = (
@@ -24,7 +21,7 @@ object CountriesApp extends App {
       (__ \ "area").read[Float]
   )(Country)
 
-  val countriesJson: JsValue = Json.using[Json.WithDefaultValues].parse(source.mkString(""))
+  val countriesJson: JsValue = Json.parse(source.mkString(""))
 
   val countriesValidated: JsResult[List[Country]] = countriesJson.validate[List[Country]]
 
@@ -58,10 +55,6 @@ object CountriesApp extends App {
     writer.flush()
     writer.close()
   }
-
-//  println(countriesList)
-//  println(convertCountiesToJson(countriesList))
-//  println(convertCountiesToJson(countriesList.filter(_.region contains "Africa").sortBy(- _.area).take(1)))
 
   val outFile = args(0)
 
