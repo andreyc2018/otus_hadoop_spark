@@ -1,7 +1,6 @@
 import scala.io.Source
 import play.api.libs.functional.syntax._
 import play.api.libs.json.Format.GenericFormat
-import play.api.libs.json.Reads.minLength
 import play.api.libs.json._
 
 import java.io.PrintWriter
@@ -51,7 +50,7 @@ object CountriesApp extends App {
     val dataToWrite: JsValue = convertCountiesToJson(countries)
 
     val writer = new PrintWriter(fileName)
-    writer.println(dataToWrite)
+    writer.println(Json.prettyPrint(dataToWrite))
     writer.flush()
     writer.close()
   }
