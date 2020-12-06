@@ -59,56 +59,11 @@ object CountriesApp extends App {
     writer.close()
   }
 
-  println(countriesList)
+//  println(countriesList)
 //  println(convertCountiesToJson(countriesList))
 //  println(convertCountiesToJson(countriesList.filter(_.region contains "Africa").sortBy(- _.area).take(1)))
 
   val outFile = args(0)
 
   writeToFile(outFile, "Africa", 10)
-//  val tweetsString =
-//    """
-//      |[
-//      |    {"username":"John", "tweet":"Scala rules!", "date":"Mon Sep 23 07:38:13 MDT 2013"},
-//      |    {"username":"Jane", "tweet":"Play is awesome!", "date":"Mon Sep 23 07:38:15 MDT 2013"},
-//      |    {"username":"Fred", "tweet":"FP rocks!", "date":"Mon Sep 23 07:38:17 MDT 2013"}
-//      |]
-//      |""".stripMargin
-//
-//  case class Tweet(username: String, tweet: String, date: String)
-//
-//  implicit val tweetReads: Reads[Tweet] = (
-//    (__ \ "username" ).read[String] and
-//      (__ \ "tweet" ).read[String] and
-//      (__ \ "date").read[String]
-//    )(Tweet)
-//
-//  val tweetsJson: JsValue = Json.parse(tweetsString)
-//
-//  val tweetsValidated: JsResult[List[Tweet]] = tweetsJson.validate[List[Tweet]]
-//
-//  val tweetsList: immutable.Seq[Tweet] = tweetsValidated match {
-//    case JsSuccess(list: List[Tweet], _) => list
-//    case e: JsError => { List() }
-//  }
-//
-//  def convertTweetsToJsonOrig(tweets: Seq[Tweet]): JsValue = {
-//    Json.toJson(
-//      tweets.map { t =>
-//        Map("username" -> t.username, "tweet" -> t.tweet, "date" -> t.date)
-//      }
-//    )
-//  }
-//
-//  def writeTweetsToFile(fileName: String, tweets: Seq[Tweet]) = {
-//    val dataToWrite = convertTweetsToJsonOrig(tweets)
-//    val writer = new PrintWriter(fileName)
-//    writer.println(dataToWrite)
-//    writer.flush()
-//    writer.close()
-//  }
-//
-//  println(tweetsList)
-//  println(convertTweetsToJsonOrig(tweetsList))
-//  writeTweetsToFile(outFile, tweetsList)
 }
