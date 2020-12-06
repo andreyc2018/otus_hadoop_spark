@@ -2,6 +2,9 @@ import scala.io.Source
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 
+import java.io.PrintWriter
+import scala.collection.immutable
+
 object CountriesApp extends App {
 //  def source = Source.fromURL(
 //    "https://raw.githubusercontent.com/mledoze/countries/master/countries.json"
@@ -19,15 +22,34 @@ object CountriesApp extends App {
       (__ \ "area").read[Int]
   )(Country)
 
-  val countriesJson = Json.parse(source.mkString(""))
+  val countriesJson: JsValue = Json.parse(source.mkString(""))
 
-  val countriesValidated = countriesJson.validate[List[Country]]
+  val countriesValidated: JsResult[List[Country]] = countriesJson.validate[List[Country]]
 
-  val countriesList = countriesValidated match {
+  val countriesList: immutable.Seq[Country] = countriesValidated match {
     case JsSuccess(list: List[Country], _) => list
-    case e: JsError => {
-      List()
-    }
+    case e: JsError => { List() }
+  }
+
+  def filterRecords(region: String)(countries: Iterable[Country]): Iterable[Country] = {
+    countries.filter(country => (country.region == region))
+  }
+
+  def renderRecord()(country: Country) = {
+//    { "name": "bla", "capital: "bar", "area": 100 }
+
+  }
+
+  def writeToFile(fileName: String, region: String, count: Int) = {
+    val dataToWrite =
+      filterRecords(region)(countriesList)
+        .map(renderRecord())
+        .mkString("\n")
+
+    val writer = new PrintWriter(fileName)
+    writer.println(dataToWrite)
+    writer.flush()
+    writer.close()
   }
 
   println(countriesList.filter(_.region contains "Africa"))
