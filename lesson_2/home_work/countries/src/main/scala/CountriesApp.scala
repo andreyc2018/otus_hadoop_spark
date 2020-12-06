@@ -36,11 +36,15 @@ object CountriesApp extends App {
     countries.filter(country => (country.region == region)).sortBy(- _.area).take(count)
   }
 
-//  def renderRecord()(country: Country) = {
-////    { "name": "bla", "capital: "bar", "area": 100 }
-//    println(country.name, country.capital, country.area)
-//  }
-//
+  // { "name": "bla", "capital: "bar", "area": 100 }
+  def convertCountiesToJson(countries: Seq[Country]): JsValue = {
+    Json.toJson(
+      countries.map { c =>
+        Map("name" -> JsString(c.name), "capital" -> JsString(c.capital), "area" -> JsNumber(c.area))
+      }
+    )
+  }
+
 //  def writeToFile(fileName: String, region: String, count: Int) = {
 //    val countries: Seq[Country] = filterRecords(region, count)(countriesList)
 //    val dataToWrite: JsValue = Json.toJson(
@@ -53,7 +57,9 @@ object CountriesApp extends App {
 //    writer.close()
 //  }
 
-//  println(countriesList.filter(_.region contains "Africa").sortBy(- _.area).take(1))
+  println(convertCountiesToJson(countriesList.filter(_.region contains "Africa").sortBy(- _.area).take(1)))
+  println(countriesList)
+  println(convertCountiesToJson(countriesList))
 
   val outFile = args(0)
 
@@ -92,7 +98,7 @@ object CountriesApp extends App {
     )
   }
 
-  def writeToFile(fileName: String, tweets: Seq[Tweet]) = {
+  def writeTweetsToFile(fileName: String, tweets: Seq[Tweet]) = {
     val dataToWrite = convertTweetsToJsonOrig(tweets)
     val writer = new PrintWriter(fileName)
     writer.println(dataToWrite)
@@ -102,5 +108,5 @@ object CountriesApp extends App {
 
   println(tweetsList)
   println(convertTweetsToJsonOrig(tweetsList))
-  writeToFile(outFile, tweetsList)
+  writeTweetsToFile(outFile, tweetsList)
 }
