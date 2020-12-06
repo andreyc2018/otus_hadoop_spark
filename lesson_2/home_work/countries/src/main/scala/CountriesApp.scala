@@ -1,5 +1,6 @@
 import scala.io.Source
 import play.api.libs.functional.syntax._
+import play.api.libs.json.Format.GenericFormat
 import play.api.libs.json._
 
 import java.io.PrintWriter
@@ -31,26 +32,75 @@ object CountriesApp extends App {
     case e: JsError => { List() }
   }
 
-  def filterRecords(region: String)(countries: Iterable[Country]): Iterable[Country] = {
-    countries.filter(country => (country.region == region))
+  def filterRecords(region: String, count: Int)(countries: Seq[Country]) = {
+    countries.filter(country => (country.region == region)).sortBy(- _.area).take(count)
   }
 
-  def renderRecord()(country: Country) = {
-//    { "name": "bla", "capital: "bar", "area": 100 }
+//  def renderRecord()(country: Country) = {
+////    { "name": "bla", "capital: "bar", "area": 100 }
+//    println(country.name, country.capital, country.area)
+//  }
+//
+//  def writeToFile(fileName: String, region: String, count: Int) = {
+//    val countries: Seq[Country] = filterRecords(region, count)(countriesList)
+//    val dataToWrite: JsValue = Json.toJson(
+//      countries.map(c => Map("name" -> c.name, "capital" -> c.capital, "area" -> c.area))
+//    )
+//
+//    val writer = new PrintWriter(fileName)
+//    writer.println(dataToWrite)
+//    writer.flush()
+//    writer.close()
+//  }
 
+//  println(countriesList.filter(_.region contains "Africa").sortBy(- _.area).take(1))
+
+  val outFile = args(0)
+
+//  writeToFile(outFile, "Africa", 1)
+  val tweetsString =
+    """
+      |[
+      |    {"username":"John", "tweet":"Scala rules!", "date":"Mon Sep 23 07:38:13 MDT 2013"},
+      |    {"username":"Jane", "tweet":"Play is awesome!", "date":"Mon Sep 23 07:38:15 MDT 2013"},
+      |    {"username":"Fred", "tweet":"FP rocks!", "date":"Mon Sep 23 07:38:17 MDT 2013"}
+      |]
+      |""".stripMargin
+
+  case class Tweet(username: String, tweet: String, date: String)
+
+  implicit val tweetReads: Reads[Tweet] = (
+    (__ \ "username" ).read[String] and
+      (__ \ "tweet" ).read[String] and
+      (__ \ "date").read[String]
+    )(Tweet)
+
+  val tweetsJson: JsValue = Json.parse(tweetsString)
+
+  val tweetsValidated: JsResult[List[Tweet]] = tweetsJson.validate[List[Tweet]]
+
+  val tweetsList: immutable.Seq[Tweet] = tweetsValidated match {
+    case JsSuccess(list: List[Tweet], _) => list
+    case e: JsError => { List() }
   }
 
-  def writeToFile(fileName: String, region: String, count: Int) = {
-    val dataToWrite =
-      filterRecords(region)(countriesList)
-        .map(renderRecord())
-        .mkString("\n")
+  def convertTweetsToJsonOrig(tweets: Seq[Tweet]): JsValue = {
+    Json.toJson(
+      tweets.map { t =>
+        Map("username" -> t.username, "tweet" -> t.tweet, "date" -> t.date)
+      }
+    )
+  }
 
+  def writeToFile(fileName: String, tweets: Seq[Tweet]) = {
+    val dataToWrite = convertTweetsToJsonOrig(tweets)
     val writer = new PrintWriter(fileName)
     writer.println(dataToWrite)
     writer.flush()
     writer.close()
   }
 
-  println(countriesList.filter(_.region contains "Africa"))
+  println(tweetsList)
+  println(convertTweetsToJsonOrig(tweetsList))
+  writeToFile(outFile, tweetsList)
 }
