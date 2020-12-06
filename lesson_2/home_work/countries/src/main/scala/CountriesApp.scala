@@ -15,7 +15,7 @@ object CountriesApp extends App {
 //  def source = Source.fromFile(
 //    "/home/andrey/Projects/learning/otus/otus_hadoop_spark/lesson_2/home_work/data/countries_short.json"
 //  )
-  case class Country(name: String, capital: String = "", region: String, area: Float)
+  case class Country(name: String, capital: String, region: String, area: Float)
 
   implicit val reads: Reads[Country] = (
     (__ \ "name" \ "common").read[String] and
