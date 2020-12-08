@@ -10,6 +10,11 @@ libraryDependencies ++= Seq(
 )
 
 assemblyMergeStrategy in assembly := {
+  case PathList("META-INF", xs @ _*) => MergeStrategy.discard
+  case x => MergeStrategy.first
+}
+
+assemblyMergeStrategy in assembly := {
   case "module-info.class" => MergeStrategy.discard
   case x =>
     val oldStrategy = (assemblyMergeStrategy in assembly).value

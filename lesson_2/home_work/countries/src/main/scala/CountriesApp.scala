@@ -1,10 +1,12 @@
 import scala.io.Source
+import scala.collection.immutable
 import play.api.libs.functional.syntax._
 import play.api.libs.json.Format.GenericFormat
 import play.api.libs.json._
 
 import java.io.PrintWriter
-import scala.collection.immutable
+import org.apache.hadoop.conf.Configuration
+import org.apache.hadoop.fs.{FileSystem, Path}
 
 object CountriesApp extends App {
   def source = Source.fromURL(
@@ -55,7 +57,21 @@ object CountriesApp extends App {
     writer.close()
   }
 
+  def writeToHdfs(uri: String, filePath: String, data: Array[Byte]) = {
+    System.setProperty("HADOOP_USER_NAME", "User")
+    val path = new Path(filePath)
+    val conf = new Configuration()
+    conf.set("fs.defaultFS", uri)
+    val fs = FileSystem.get(conf)
+    val os = fs.create(path)
+    os.write(data)
+    fs.close()
+  }
+
   val outFile = args(0)
 
+  println("Trying to write to HDFS")
+  writeToHdfs("hdfs://192.168.44.201:9867/", "test.txt", "Hello World".getBytes)
+  println("Trying to write to local fs")
   writeToFile(outFile, "Africa", 10)
 }
