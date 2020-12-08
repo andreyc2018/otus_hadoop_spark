@@ -51,7 +51,7 @@ object CountriesApp extends App {
     val dataToWrite: JsValue = convertCountiesToJson(countries)
 
     val writer = new PrintWriter(fileName)
-    writer.println(dataToWrite)
+    writer.println(Json.prettyPrint(dataToWrite))
     writer.flush()
     writer.close()
   }
