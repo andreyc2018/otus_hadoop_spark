@@ -1,11 +1,11 @@
-import com.typesafe.scalalogging.Logger
+import org.slf4j.LoggerFactory
 import org.apache.hadoop.conf._
 import org.apache.hadoop.fs._
 
 import java.net.URI
 
 object CopyFiles extends App {
-  val logger = Logger("name")
+  val logger = LoggerFactory.getLogger(getClass.getSimpleName)
   logger.info("Starting")
   val conf = new Configuration()
   val fileSystem = FileSystem.get(new URI("hdfs://localhost:9000"), conf)
