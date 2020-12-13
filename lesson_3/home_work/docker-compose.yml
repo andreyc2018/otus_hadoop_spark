@@ -22,8 +22,6 @@ services:
     container_name: datanode
     hostname: datanode
     restart: always
-    ports:
-      - 9866:9866
     volumes:
       - hadoop_datanode:/hadoop/dfs/data
     environment:
@@ -31,6 +29,19 @@ services:
     env_file:
       - ./hadoop.env
   
+  datanode2:
+    image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+    container_name: datanode2
+    hostname: datanode2
+    restart: always
+    volumes:
+      - hadoop_datanode2:/hadoop/dfs/data
+    environment:
+      SERVICE_PRECONDITION: "namenode:9870"
+    env_file:
+      - ./hadoop.env
+
 volumes:
   hadoop_namenode:
   hadoop_datanode:
+  hadoop_datanode2:
