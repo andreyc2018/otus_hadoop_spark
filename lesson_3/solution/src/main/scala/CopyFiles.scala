@@ -19,7 +19,7 @@ object CopyFiles extends App {
     println("srcFile = " + srcFile.toString)
     val readFromFile: FSDataInputStream = fs.open(file.getPath)
     println("Read from = " + readFromFile.toString)
-    
+
     readFromFile.readFully(buffer)
   }
 
