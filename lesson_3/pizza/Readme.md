@@ -13,3 +13,7 @@ or
 ```sh
 sbt '; set scalacOptions in ThisBuild ++= Seq("-unchecked", "-deprecation") ; test'
 ```
+
+## Links
+* [User guide](https://www.scalatest.org/user_guide)
+* [Selecting a test style](https://www.scalatest.org/user_guide/selecting_a_style)
