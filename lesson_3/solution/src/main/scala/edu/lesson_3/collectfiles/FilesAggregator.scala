@@ -1,11 +1,12 @@
-import org.slf4j.LoggerFactory
-import org.apache.hadoop.conf._
+package edu.lesson_3.collectfiles
+
+import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs._
+import org.slf4j.LoggerFactory
 
 import java.net.URI
-import java.io.File
 
-object CopyFiles extends App {
+object FilesAggregator extends App {
 
   def appendToFile(srdDir: String, dstFile: String): Unit = {
 
@@ -20,14 +21,14 @@ object CopyFiles extends App {
     val readFromFile: FSDataInputStream = fs.open(file.getPath)
     println("Read from = " + readFromFile.toString)
 
-    readFromFile.readFully(buffer)
+    //    readFromFile.readFully(buffer)
   }
 
   def processDir(fs: FileSystem, dstPath: String)(file: FileStatus): Unit = {
     println("process dir = " + file.getPath.getName)
 
     val fileFilter = new GlobFilter("*.csv")
-//    val dst = new Path("/" + file.getPath.getParent.getName + "/" + file.getPath.getName)
+    //    val dst = new Path("/" + file.getPath.getParent.getName + "/" + file.getPath.getName)
     val srcFiles = fs.listStatus(file.getPath, fileFilter).filter(file => (file.isFile == true))
     srcFiles.map(showFile(fs, dstPath))
   }
@@ -41,10 +42,10 @@ object CopyFiles extends App {
   val srcPath = new Path("/stage")
   val srcDirs = fileSystem.listStatus(srcPath, dirFilter).filter(file => (file.isDirectory == true))
   srcDirs.map(processDir(fileSystem, "/ods"))
-//  val lfs = it.next()
-//  val name = lfs.getPath().getName()
-//  logger.info("lfs = {}, name = {}, path = {}", lfs, name, lfs.getPath())
-//  println(it)
-//  val file: FSDataInputStream = fileSystem.open(path)
-//  println(file)
+  //  val lfs = it.next()
+  //  val name = lfs.getPath().getName()
+  //  logger.info("lfs = {}, name = {}, path = {}", lfs, name, lfs.getPath())
+  //  println(it)
+  //  val file: FSDataInputStream = fileSystem.open(path)
+  //  println(file)
 }
