@@ -12,10 +12,10 @@ object FilesAggregator extends App {
 
   }
 
-  def showFile(fs: FileSystem, dstPath: String)(file: FileStatus): Unit = {
-    println("dst = " + dstPath.toString)
-    println("copy file = " + file.getPath.getName)
-    println("copy file = " + file.toString)
+  def showFile(fs: FileSystem, dstFile: String)(file: FileStatus): Unit = {
+    println("dst file = " + dstFile.toString)
+    println("src file = " + file.getPath)
+    println("file = " + file.toString)
     val srcFile = new Path("/" + file.getPath.getParent.getName + "/" + file.getPath.getName)
     println("srcFile = " + srcFile.toString)
     val readFromFile: FSDataInputStream = fs.open(file.getPath)
@@ -24,13 +24,14 @@ object FilesAggregator extends App {
     //    readFromFile.readFully(buffer)
   }
 
-  def processDir(fs: FileSystem, dstPath: String)(file: FileStatus): Unit = {
+  def processDir(fs: FileSystem, dstRoot: String)(file: FileStatus): Unit = {
     println("process dir = " + file.getPath.getName)
-
+    println("process path = " + file.getPath)
+    val dstFile = dstRoot + "/" + file.getPath.getName + "/" + "part-0000.csv"
     val fileFilter = new GlobFilter("*.csv")
     //    val dst = new Path("/" + file.getPath.getParent.getName + "/" + file.getPath.getName)
-    val srcFiles = fs.listStatus(file.getPath, fileFilter).filter(file => (file.isFile == true))
-    srcFiles.map(showFile(fs, dstPath))
+    val srcFiles = fs.listStatus(file.getPath, fileFilter).filter(file => file.isFile)
+    srcFiles.foreach(showFile(fs, dstFile))
   }
 
   val logger = LoggerFactory.getLogger(getClass.getSimpleName)
@@ -40,8 +41,8 @@ object FilesAggregator extends App {
 
   val dirFilter = new GlobFilter("date=*")
   val srcPath = new Path("/stage")
-  val srcDirs = fileSystem.listStatus(srcPath, dirFilter).filter(file => (file.isDirectory == true))
-  srcDirs.map(processDir(fileSystem, "/ods"))
+  val srcDirs = fileSystem.listStatus(srcPath, dirFilter).filter(file => file.isDirectory)
+  srcDirs.foreach(processDir(fileSystem, "/ods"))
   //  val lfs = it.next()
   //  val name = lfs.getPath().getName()
   //  logger.info("lfs = {}, name = {}, path = {}", lfs, name, lfs.getPath())
