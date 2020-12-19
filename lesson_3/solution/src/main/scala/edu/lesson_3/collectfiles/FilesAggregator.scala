@@ -24,25 +24,36 @@ object FilesAggregator extends App {
     //    readFromFile.readFully(buffer)
   }
 
-  def processDir(fs: FileSystem, dstRoot: String)(file: FileStatus): Unit = {
-    println("process dir = " + file.getPath.getName)
-    println("process path = " + file.getPath)
+  def processDir(fs: FileSystem, dstRoot: String, filter: String)(file: FileStatus): Unit = {
+//    println("process dir = " + file.getPath.getName)
+//    println("process path = " + file.getPath)
+//    println("file status = " + file.getPath)
     val dstFile = dstRoot + "/" + file.getPath.getName + "/" + "part-0000.csv"
-    val fileFilter = new GlobFilter("*.csv")
-    //    val dst = new Path("/" + file.getPath.getParent.getName + "/" + file.getPath.getName)
-    val srcFiles = fs.listStatus(file.getPath, fileFilter).filter(file => file.isFile)
+//    val fileFilter = new GlobFilter("*.csv")
+//    val dst = new Path("/" + file.getPath.getParent.getName + "/" + file.getPath.getName)
+//    val srcFiles = fs.listStatus(file.getPath, fileFilter).filter(file => file.isFile)
+    val srcFiles = listFiles(fs, file.getPath, filter)
     srcFiles.foreach(showFile(fs, dstFile))
+  }
+
+  def listFiles(fs: FileSystem, path: Path, filter: String): Array[FileStatus] = {
+    val fileFilter = new GlobFilter(filter)
+    fs.listStatus(path, fileFilter).filter(file => file.isFile)
+  }
+
+  def listDirs(fs: FileSystem, path: String, filter: String): Array[FileStatus] = {
+    val dirFilter = new GlobFilter(filter)
+    val srcPath = new Path(path)
+    fs.listStatus(srcPath, dirFilter).filter(file => file.isDirectory)
   }
 
   val logger = LoggerFactory.getLogger(getClass.getSimpleName)
   logger.info("Starting")
   val conf = new Configuration()
-  val fileSystem = FileSystem.get(new URI("hdfs://localhost:9000"), conf)
+  val fs: FileSystem = FileSystem.get(new URI("hdfs://localhost:9000"), conf)
 
-  val dirFilter = new GlobFilter("date=*")
-  val srcPath = new Path("/stage")
-  val srcDirs = fileSystem.listStatus(srcPath, dirFilter).filter(file => file.isDirectory)
-  srcDirs.foreach(processDir(fileSystem, "/ods"))
+  val srcDirs = listDirs(fs, "/stage", "date=*")
+  srcDirs.foreach(processDir(fs, "/ods", "*.csv"))
   //  val lfs = it.next()
   //  val name = lfs.getPath().getName()
   //  logger.info("lfs = {}, name = {}, path = {}", lfs, name, lfs.getPath())
