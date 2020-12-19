@@ -15,25 +15,27 @@ object FilesAggregator extends App {
   def showFile(fs: FileSystem, dstFile: String)(file: FileStatus): Unit = {
     println("dst file = " + dstFile.toString)
     println("src file = " + file.getPath)
-    println("file = " + file.toString)
+//    println("file = " + file.toString)
     val srcFile = new Path("/" + file.getPath.getParent.getName + "/" + file.getPath.getName)
     println("srcFile = " + srcFile.toString)
+//    if (!fs.exists(dstFile)) {
+//
+//    }
     val readFromFile: FSDataInputStream = fs.open(file.getPath)
-    println("Read from = " + readFromFile.toString)
+//    println("Read from = " + readFromFile.toString)
 
     //    readFromFile.readFully(buffer)
   }
 
   def processDir(fs: FileSystem, dstRoot: String, filter: String)(file: FileStatus): Unit = {
-//    println("process dir = " + file.getPath.getName)
-//    println("process path = " + file.getPath)
-//    println("file status = " + file.getPath)
     val dstFile = dstRoot + "/" + file.getPath.getName + "/" + "part-0000.csv"
-//    val fileFilter = new GlobFilter("*.csv")
-//    val dst = new Path("/" + file.getPath.getParent.getName + "/" + file.getPath.getName)
-//    val srcFiles = fs.listStatus(file.getPath, fileFilter).filter(file => file.isFile)
     val srcFiles = listFiles(fs, file.getPath, filter)
     srcFiles.foreach(showFile(fs, dstFile))
+  }
+
+  def makeDir(fs: FileSystem, path: String): Unit = {
+    val dir = new Path(path)
+    fs.mkdirs(dir)
   }
 
   def listFiles(fs: FileSystem, path: Path, filter: String): Array[FileStatus] = {
@@ -54,10 +56,4 @@ object FilesAggregator extends App {
 
   val srcDirs = listDirs(fs, "/stage", "date=*")
   srcDirs.foreach(processDir(fs, "/ods", "*.csv"))
-  //  val lfs = it.next()
-  //  val name = lfs.getPath().getName()
-  //  logger.info("lfs = {}, name = {}, path = {}", lfs, name, lfs.getPath())
-  //  println(it)
-  //  val file: FSDataInputStream = fileSystem.open(path)
-  //  println(file)
 }
