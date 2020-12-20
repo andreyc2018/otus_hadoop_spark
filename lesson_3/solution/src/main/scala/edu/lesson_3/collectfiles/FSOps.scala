@@ -20,7 +20,7 @@ class FSOps(root: String) {
     if (!fs.exists(dir)) {
       return fs.mkdirs(dir)
     }
-    return false
+    return true
   }
 
   def listFiles(dir: String, filter: String) = {}
