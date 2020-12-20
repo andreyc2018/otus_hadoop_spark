@@ -14,9 +14,7 @@ class FSOpsTest extends AnyFunSuite with BeforeAndAfter {
 
   test("make directory") {
     val fs_ops = new FSOps("hdfs://localhost:9000")
-    fs_ops
-    val dirs = fs_ops.listDirs("/", "*")
-    dirs.foreach(f => println(f.toString))
-    assert(!dirs.isEmpty)
+    val status = fs_ops.makeDirs("test_dir")
+    assert(status)
   }
 }

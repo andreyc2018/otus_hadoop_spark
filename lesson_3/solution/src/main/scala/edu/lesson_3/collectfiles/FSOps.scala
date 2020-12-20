@@ -15,8 +15,12 @@ class FSOps(root: String) {
     fs.listStatus(srcPath, dirFilter).filter(file => file.isDirectory)
   }
 
-  def makeDirs(path: String) = {
-    fs.mkdirs()
+  def makeDirs(path: String): Boolean = {
+    val dir = new Path(path)
+    if (!fs.exists(dir)) {
+      return fs.mkdirs(dir)
+    }
+    return false
   }
 
   def listFiles(dir: String, filter: String) = {}
