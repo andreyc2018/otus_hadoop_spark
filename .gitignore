@@ -1,5 +1,7 @@
 **/.bsp/
 **/.metals/
+**/.bloop/
+**/metals.sbt
 **/out.json
 
 # Created by https://www.toptal.com/developers/gitignore/api/scala,sbt
