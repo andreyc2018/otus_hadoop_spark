@@ -1,21 +1,24 @@
 package edu.lesson_3.collectfiles
 
-trait FSOps {
-  def listDirs(path: String, filter: String)
-  def listFiles(dir: String, filter: String)
-  def appendToFile(src: String, dst: String)
-}
+import org.apache.hadoop.conf.Configuration
+import org.apache.hadoop.fs.{FileStatus, FileSystem, GlobFilter, Path}
 
-class HDFSOps extends FSOps {
-  override def listDirs(path: String, filter: String): Unit = {
-//    ???
+import java.net.URI
+
+class FSOps(root: String) {
+  val conf = new Configuration()
+  val fs: FileSystem = FileSystem.get(new URI(root), conf)
+
+  def listDirs(path: String, filter: String): Array[FileStatus] = {
+    val dirFilter = new GlobFilter(filter)
+    val srcPath = new Path(path)
+    fs.listStatus(srcPath, dirFilter).filter(file => file.isDirectory)
   }
 
-  override def listFiles(dir: String, filter: String): Unit = {
-//    ???
+  def makeDirs(path: String) = {
+    fs.mkdirs()
   }
 
-  override def appendToFile(src: String, dst: String): Unit = {
-//    ???
-  }
+  def listFiles(dir: String, filter: String) = {}
+  def appendToFile(src: String, dst: String) = {}
 }

@@ -4,14 +4,19 @@ import org.scalatest.BeforeAndAfter
 import org.scalatest.funsuite.AnyFunSuite
 
 class FSOpsTest extends AnyFunSuite with BeforeAndAfter {
-  var fs: FSOps = _
-
-  before {
-    fs = new HDFSOps
-  }
 
   test("list directories") {
-//    val dirs = fs.listDirs("/test_root", "dir_*")
-//    assert(!dirs.isEmpty)
+    val fs_ops = new FSOps("hdfs://localhost:9000")
+    val dirs = fs_ops.listDirs("/", "*")
+    dirs.foreach(f => println(f.toString))
+    assert(!dirs.isEmpty)
+  }
+
+  test("make directory") {
+    val fs_ops = new FSOps("hdfs://localhost:9000")
+    fs_ops
+    val dirs = fs_ops.listDirs("/", "*")
+    dirs.foreach(f => println(f.toString))
+    assert(!dirs.isEmpty)
   }
 }
