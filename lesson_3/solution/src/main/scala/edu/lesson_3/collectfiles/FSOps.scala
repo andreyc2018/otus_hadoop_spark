@@ -44,13 +44,10 @@ class FSOps(root: String) {
   }
 
   def readFile(path: String): ArrayBuffer[Byte] = {
-    println("Reading " + path)
     readFile(new Path(path))
   }
 
   def readFile(path: Path): ArrayBuffer[Byte] = {
-    println("Reading " + path.toString)
-
     val in = new BufferedInputStream(fs.open(path))
     val byteArray = new Array[Byte](1024)
     var data = ArrayBuffer[Byte]()
