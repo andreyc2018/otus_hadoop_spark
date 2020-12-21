@@ -56,8 +56,10 @@ class FSOpsTest extends AnyFunSuite with BeforeAndAfter {
      var numBytes = 0
      do {
        numBytes = in.read(byteArray)
-       val str = new String(byteArray, StandardCharsets.UTF_8)
-       printf("%d: %s\n", numBytes, str)
+       if (numBytes > 0) {
+         val str = new String(byteArray, StandardCharsets.UTF_8)
+         printf("byteArray size = %d, numBytes = %d:\n%s\n", byteArray.length, numBytes, str)
+       }
      } while (numBytes > 0)
      in.close()
      assert(numBytes == -1)
@@ -78,9 +80,11 @@ class FSOpsTest extends AnyFunSuite with BeforeAndAfter {
       if (numBytes > 0) {
         val bytes = byteArray.slice(0, numBytes)
         data ++= bytes
+
         val str_1 = new String(data.toArray.slice(totalBytes, totalBytes+numBytes), StandardCharsets.UTF_8)
         printf("data slice: %s\n", str_1.substring(0, 50))
         totalBytes += numBytes
+
         val str = new String(bytes, StandardCharsets.UTF_8)
         printf("byteArray size = %d, numBytes = %d: %s\n", byteArray.length, numBytes, str.substring(0, 50))
       }
@@ -88,21 +92,27 @@ class FSOpsTest extends AnyFunSuite with BeforeAndAfter {
     in_1.close()
     assert(numBytes <= 0)
 
+    val eol: Byte = '\n'.toByte
+    println("last: %c".format(data.last.toChar))
+    if (data.last != '\n') {
+      data.append(eol)
+    }
+    println("last: %c".format(data.last.toChar))
+
     val file_2 = new Path("/stage/date=2020-12-03/part-0002.csv")
     val in_2 = new BufferedInputStream(fs_ops.fs.open(file_2))
 
     val str_1 = new String(data.toArray, StandardCharsets.UTF_8)
-    printf("total = %d, data length = %d:\n%s\n", totalBytes, data.length, str_1.substring(0, 50))
+    printf("total = %d, data length = %d:\n%s\n", totalBytes, data.length, str_1)
 
     do {
       numBytes = in_2.read(byteArray)
       if (numBytes > 0) {
         val bytes = byteArray.slice(0, numBytes)
+        data ++= bytes
+
         val str = new String(bytes, StandardCharsets.UTF_8)
         printf("byteArray size = %d, numBytes = %d:\n%s\n", byteArray.length, numBytes, str)
-
-        data ++= bytes
-//        val str_1 = new String(data.toArray.slice(totalBytes, totalBytes+numBytes), StandardCharsets.UTF_8)
         val str_1 = new String(data.toArray, StandardCharsets.UTF_8)
         printf("data:\n%s\n", str_1)
         totalBytes += numBytes
