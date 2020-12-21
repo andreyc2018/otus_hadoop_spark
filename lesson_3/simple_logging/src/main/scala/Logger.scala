@@ -1,6 +1,6 @@
 import org.slf4j.LoggerFactory
 
-object Main extends App {
+object Logger extends App {
   val logger = LoggerFactory.getLogger(getClass.getSimpleName)
   logger.info("Log INFO message")
   logger.debug("Log DEBUG message")
