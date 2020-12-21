@@ -11,10 +11,25 @@ class FSOps(root: String) {
   val conf = new Configuration()
   val fs: FileSystem = FileSystem.get(new URI(root), conf)
 
+  def deleteEntry(path: String): Boolean = {
+    fs.delete(new Path(path), true)
+  }
+
   def listDirs(path: String, filter: String): Array[FileStatus] = {
-    val dirFilter = new GlobFilter(filter)
-    val srcPath = new Path(path)
-    fs.listStatus(srcPath, dirFilter).filter(file => file.isDirectory)
+    fs.listStatus(new Path(path), new GlobFilter(filter)).filter(file => file.isDirectory)
+  }
+
+  def listFiles(path: String, filter: String): Array[FileStatus] = {
+    fs.listStatus(new Path(path), new GlobFilter(filter)).filter(file => file.isFile)
+  }
+
+  def fileSize(path: String): Long = {
+    val status: FileStatus = fs.getFileStatus(new Path(path))
+    println("status = " + status.toString)
+    if (status.isFile) {
+      return status.getLen
+    }
+    return 0
   }
 
   def makeDirs(path: String): Boolean = {
@@ -49,7 +64,4 @@ class FSOps(root: String) {
     out.write(data)
     out.close()
   }
-
-  def listFiles(dir: String, filter: String) = {}
-  def appendToFile(src: String, dst: String) = {}
 }
