@@ -44,6 +44,12 @@ class FSOps(root: String) {
     return data
   }
 
+  def writeToFile(path: String, data: Array[Byte]) = {
+    val out = fs.create(new Path(path))
+    out.write(data)
+    out.close()
+  }
+
   def listFiles(dir: String, filter: String) = {}
   def appendToFile(src: String, dst: String) = {}
 }
