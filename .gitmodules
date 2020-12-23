@@ -1,0 +1,6 @@
+[submodule "lesson_3/hadoop_course_homework"]
+	path = lesson_3/hadoop_course_homework
+	url = https://github.com/Gorini4/hadoop_course_homework.git
+[submodule "lesson_4/yarn_docker"]
+	path = lesson_4/yarn_docker
+	url = https://github.com/Gorini4/yarn_docker.git
