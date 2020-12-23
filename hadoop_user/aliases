@@ -4,3 +4,8 @@ alias hrm='hadoop fs -rm -skipTrash'
 alias hcat='hadoop fs -cat'
 alias hmkdir='hadoop fs -mkdir'
 
+alias dhls='docker exec namenode hdfs dfs -ls'
+alias dhrm='docker exec namenode hdfs dfs -rm -skipTrash'
+alias dhcat='docker exec namenode hdfs dfs -cat'
+alias dhmkdir='docker exec namenode hdfs dfs -mkdir'
+
