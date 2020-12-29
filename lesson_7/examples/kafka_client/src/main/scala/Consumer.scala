@@ -14,7 +14,7 @@ object Consumer extends App {
   consumer.subscribe(List("mytopic").asJavaCollection)
 
   consumer
-    .poll(Duration.ofSeconds(1))
+    .poll(Duration.ofSeconds(10))
     .asScala
     .foreach { r => printf("%s: %s\n", r.key(), r.value()) }
 
