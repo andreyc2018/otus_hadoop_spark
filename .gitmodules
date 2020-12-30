@@ -4,3 +4,6 @@
 [submodule "lesson_4/yarn_docker"]
 	path = lesson_5/yarn_docker
 	url = https://github.com/Gorini4/yarn_docker.git
+[submodule "lesson_7/kafka_scala_example"]
+	path = lesson_7/kafka_scala_example
+	url = https://github.com/Gorini4/kafka_scala_example
