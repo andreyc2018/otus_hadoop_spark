@@ -16,7 +16,7 @@ object Consumer extends App {
   consumer
     .poll(Duration.ofSeconds(10))
     .asScala
-    .foreach { r => printf("%s: %s\n", r.key(), r.value()) }
+    .foreach({ r => printf("%s: %s\n", r.key(), r.value()) })
 
   consumer.close()
 }

@@ -14,7 +14,7 @@ object Producer extends App {
     "message3",
   )
 
-  messages.foreach { m => producer.send(new ProducerRecord("mytopic", "key", m))}
+  messages.foreach({ m => producer.send(new ProducerRecord("mytopic", "key", m))})
 
   producer.close()
 }
