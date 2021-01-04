@@ -10,3 +10,12 @@
 
 ## Решение
 
+### Kafka Writer
+1. Read from `csv` file provided as an argument
+2. For each record in input file:
+    1. convert `csv` to `json`
+    2. write `json` to `kafka:books`
+
+### Kafka Reader
+1. Listen for the changes in `kafka:books`
+2.
