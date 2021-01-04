@@ -14,5 +14,5 @@ object KafkaClient extends App {
 
   val inputFile = args(0)
   private val writer: KafkaWriter = new KafkaWriter(inputFile)
-
+  writer.write()
 }

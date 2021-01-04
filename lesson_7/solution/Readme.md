@@ -17,5 +17,5 @@
     2. write `json` to `kafka:books`
 
 ### Kafka Reader
-1. Listen for the changes in `kafka:books`
+1. `kafka:books`
 2.

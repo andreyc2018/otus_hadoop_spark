@@ -8,4 +8,5 @@ libraryDependencies ++= Seq(
   "org.apache.kafka" % "kafka-clients" % "2.6.0",
   "com.fasterxml.jackson.core" % "jackson-databind" % "2.4.0",
   "ch.qos.logback" % "logback-classic" % "1.2.3",
+  "com.typesafe.play" %% "play-json" % "2.9.1",
 )
