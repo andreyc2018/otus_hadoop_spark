@@ -11,5 +11,6 @@ object KafkaClient extends App {
   }
 
   val inputFile = args(0)
-  Writer.fromFile(inputFile)
+  Writer.fromFile(inputFile, "books")
+  Reader.readFrom("books")
 }
