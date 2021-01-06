@@ -10,9 +10,6 @@ object KafkaClient extends App {
     System.exit(1)
   }
 
-  // https://stackoverflow.com/questions/27781020/read-csv-in-scala-into-case-class-instances-with-error-handling
-
   val inputFile = args(0)
-  private val writer: KafkaWriter = new KafkaWriter(inputFile)
-  writer.write()
+  Writer.fromFile(inputFile)
 }
