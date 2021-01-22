@@ -8,15 +8,18 @@ import org.apache.kafka.common.serialization.{LongDeserializer, StringDeserializ
 import java.time.Duration
 import java.util.Properties
 import scala.jdk.CollectionConverters._
+import scala.collection.mutable.{Map,ListBuffer}
 
 object Reader {
   case class Key(showId: String)
 
   def readFrom(topic: String): Unit = {
     val props = new Properties()
+    val batchSize = 5
+    val keepSize = 3
     props.put("bootstrap.servers", "localhost:29092")
     props.put("group.id", "lesson_7_reader")
-    props.put("max.poll.records", 3)
+    props.put("max.poll.records", batchSize)
     val consumer = new KafkaConsumer(props, new LongDeserializer, new StringDeserializer)
 
 //    val booksPartitions: Vector[TopicPartition] = consumer
@@ -37,19 +40,31 @@ object Reader {
     println(s"Subscribing to $topic")
     consumer.subscribe(List(topic).asJavaCollection)
 
-    println("Reading records")
+    println(s"Reading records in batches of $batchSize records")
+    val keepRecords: scala.collection.mutable.Map[Long, scala.collection.mutable.ListBuffer[String]] = Map()
+    var readRecords = 0
     var count = 0
     do {
       val records = consumer.poll(Duration.ofSeconds(5))
       println(s"Read ${records.count()} records")
       count = records.count()
+      if (count > 0) {
+        keepRecords.clear()
+      }
+      readRecords += count
       for (record <- records.asScala) {
+        if (!keepRecords.contains(record.partition())) {
+          keepRecords(record.partition()) = scala.collection.mutable.ListBuffer[String](record.value())
+        } else {
+          keepRecords(record.partition()) += record.value()
+        }
         println(
           s"""topic = ${record.topic()}, partition = ${record.partition()}, offset = ${record.offset()}
              |	key = ${record.key()}, data = ${record.value()}""".stripMargin)
       }
     } while (count > 0)
-    println(s"Done reading from $topic")
+    println(s"keepRecords = ${keepRecords.keys}")
+    println(s"Done reading ${readRecords} records from $topic")
     consumer.close()
 
 //    println(s"Reading from $topic")
