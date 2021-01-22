@@ -10,3 +10,6 @@
 [submodule "examples/kafka-application4s"]
 	path = examples/kafka-application4s
 	url = https://github.com/DivLoic/kafka-application4s.git
+[submodule "lesson_9/homework"]
+	path = lesson_9/homework
+	url = https://github.com/vadopolski/otus-hadoop-homework.git
