@@ -1,9 +1,9 @@
 package edu.lesson_7.kafka
 
-object KafkaClient extends App {
+import java.io.FileNotFoundException
+import scala.collection.mutable.Queue
 
-  val currentDirectory = new java.io.File(".").getCanonicalPath
-  printf("currentDirectory \"%s\"\n", currentDirectory)
+object KafkaClient extends App {
 
   if (args.length == 0) {
     println("Input filename is required.")
@@ -11,6 +11,26 @@ object KafkaClient extends App {
   }
 
   val inputFile = args(0)
-  Writer.fromFile(inputFile, "books")
-  Reader.readFrom("books")
+  try {
+    Writer.fromFile(inputFile, "books")
+    val records = Reader.readFrom("books")
+    records.foreach(p => {
+      println(s"Partition ${p._1}")
+      printPartition(p._2)
+    })
+
+  } catch {
+    case e: FileNotFoundException => { println(s"Error: ${e.getMessage}")}
+    case e: Exception => { println(s"Error: ${e.getMessage}")}
+  }
+
+  private def printRecord(record: BookRecord): Unit = {
+    println(s"${record.offset}: ${record.data}")
+  }
+
+  private def printPartition(partition: Queue[BookRecord]): Unit = {
+    partition.foreach(r => printRecord(r))
+    println()
+  }
+
 }
