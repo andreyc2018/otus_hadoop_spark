@@ -8,10 +8,18 @@ import org.apache.kafka.common.serialization.{LongDeserializer, StringDeserializ
 import java.time.Duration
 import java.util.Properties
 import scala.jdk.CollectionConverters._
-import scala.collection.mutable.{Map,ListBuffer}
+import scala.collection.mutable.{ListBuffer, Map, Queue}
 
 object Reader {
   case class Key(showId: String)
+
+  private def printRecord(record: BookRecord): Unit = {
+    println(s"${record.offset}: ${record.data}")
+  }
+
+  private def printPartition(partition: Queue[BookRecord]): Unit = {
+    partition.foreach(r => printRecord(r))
+  }
 
   def readFrom(topic: String): Unit = {
     val props = new Properties()
@@ -41,30 +49,38 @@ object Reader {
     consumer.subscribe(List(topic).asJavaCollection)
 
     println(s"Reading records in batches of $batchSize records")
-    val keepRecords: scala.collection.mutable.Map[Long, scala.collection.mutable.ListBuffer[String]] = Map()
+    val offsets = Map[Int, ListBuffer[Long]]()
+    offsets(0) = ListBuffer[Long]()
+    offsets(1) = ListBuffer[Long]()
+    offsets(2) = ListBuffer[Long]()
+    val keepRecords = Map[Int, Queue[BookRecord]]()
     var readRecords = 0
     var count = 0
     do {
       val records = consumer.poll(Duration.ofSeconds(5))
       println(s"Read ${records.count()} records")
       count = records.count()
-      if (count > 0) {
-        keepRecords.clear()
-      }
       readRecords += count
       for (record <- records.asScala) {
         if (!keepRecords.contains(record.partition())) {
-          keepRecords(record.partition()) = scala.collection.mutable.ListBuffer[String](record.value())
-        } else {
-          keepRecords(record.partition()) += record.value()
+          keepRecords(record.partition()) = Queue[BookRecord]()
         }
+        if (keepRecords(record.partition()).size == keepSize) {
+          keepRecords(record.partition()).dequeue()
+        }
+        keepRecords(record.partition()).enqueue(BookRecord(record.offset(), record.value()))
+        offsets(record.partition()) += record.offset()
         println(
           s"""topic = ${record.topic()}, partition = ${record.partition()}, offset = ${record.offset()}
              |	key = ${record.key()}, data = ${record.value()}""".stripMargin)
       }
     } while (count > 0)
-    println(s"keepRecords = ${keepRecords.keys}")
     println(s"Done reading ${readRecords} records from $topic")
+    offsets.foreach(partition => { println(s"$partition") })
+    keepRecords.foreach(partition => {
+      println(s"${partition._1}")
+      printPartition(partition._2)
+    })
     consumer.close()
 
 //    println(s"Reading from $topic")
