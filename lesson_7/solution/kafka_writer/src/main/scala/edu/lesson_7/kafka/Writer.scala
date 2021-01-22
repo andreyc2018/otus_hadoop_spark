@@ -6,7 +6,6 @@ import play.api.libs.json.{JsNumber, JsString, JsValue, Json}
 
 import java.time.Instant
 import java.util.Properties
-import scala.util.Random
 
 object Writer {
 
@@ -20,11 +19,8 @@ object Writer {
   def fromFile(filename: String, topic: String): Unit = {
     val props = new Properties()
     props.put("bootstrap.servers", "localhost:29092")
-//    props.put("transactional.id", "books")
     val producer = new KafkaProducer(props, new LongSerializer, new StringSerializer)
-//    producer.initTransactions()
-//    producer.beginTransaction()
-    var counter = 1
+    var counter = 0
     val bufferedSource = io.Source.fromFile(filename)
     bufferedSource.getLines().drop(1).foreach(line => {
       val dataToWrite = lineToJson(line)
@@ -35,9 +31,9 @@ object Writer {
       counter += 1
     })
 
-//    producer.commitTransaction()
-
     producer.close()
     bufferedSource.close()
+
+    println(s"total sent ${counter} records")
   }
 }
