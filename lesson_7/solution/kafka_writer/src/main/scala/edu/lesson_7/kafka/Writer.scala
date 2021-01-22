@@ -27,13 +27,10 @@ object Writer {
       val data = Json.stringify(dataToWrite)
       val key = Instant.now.toEpochMilli + counter
       producer.send(new ProducerRecord(topic, key, data))
-      println(s"sending key = ${key}")
       counter += 1
     })
 
     producer.close()
     bufferedSource.close()
-
-    println(s"total sent ${counter} records")
   }
 }

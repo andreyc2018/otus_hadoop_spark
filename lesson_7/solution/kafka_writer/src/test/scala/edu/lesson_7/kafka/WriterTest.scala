@@ -2,7 +2,7 @@ package edu.lesson_7.kafka
 
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.funsuite.AnyFunSuite
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{Json}
 
 class WriterTest extends AnyFunSuite with BeforeAndAfterEach {
 
