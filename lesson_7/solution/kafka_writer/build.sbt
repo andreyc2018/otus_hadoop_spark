@@ -13,3 +13,10 @@ libraryDependencies ++= Seq(
 )
 
 scalacOptions += "-deprecation"
+
+assemblyMergeStrategy in assembly := {
+  case "module-info.class" => MergeStrategy.discard
+  case x =>
+    val oldStrategy = (assemblyMergeStrategy in assembly).value
+    oldStrategy(x)
+}
