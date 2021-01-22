@@ -1,3 +1,23 @@
+## Inspect containers
+The container config files are in
+    /var/lib/docker/containers/<hash>/hostconfig.json
+
+### List running containers
+    docker ps
+### List all containers
+    docker ps -a
+### Inspect container
+    docker inspect <container id | name>
+
+## Disable auto-restart
+    docker update --restart=no <name> ...
+
+## Volumes
+### List
+    docker volume ls
+### List including dangling
+    docker volume ls -f dangling=true
+
 ## Purging All Unused or Dangling Images, Containers, Volumes, and Networks
 
 Docker provides a single command that will clean up any resources — images, containers, volumes, and networks — that are dangling (not associated with a container):

@@ -1,5 +1,10 @@
 {
     "files.watcherExclude": {
         "**/target": true
+    },
+    "files.exclude": {
+        "**/.bsp": true,
+        "**/.idea": true,
+        "**/.metals": true
     }
 }
