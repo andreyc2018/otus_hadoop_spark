@@ -18,4 +18,17 @@
 
 ### Kafka Reader
 1. `kafka:books`
-2.
+2. create three queues of size 5 each
+3. for each row in a records set dequeue an earlier row enqueue each next row
+
+```scala
+import scala.collection.mutable.Queue
+
+new Queue(initialSize: Int = ArrayDeque.DefaultInitialSize)
+
+def dequeue(): A
+Removes the first element from this queue and returns it
+
+def enqueue(elem: A): Queue.this.type
+Add elements to the end of this queue
+```
