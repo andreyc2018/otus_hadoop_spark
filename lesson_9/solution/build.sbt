@@ -1,4 +1,4 @@
-name := "otus-hadoop-homework"
+name := "data_api"
 
 version := "0.1"
 

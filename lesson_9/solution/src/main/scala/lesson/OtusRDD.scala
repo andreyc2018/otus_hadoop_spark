@@ -24,9 +24,5 @@ object OtusRDD extends App {
     .map(tz => (tz.borough, 1))
     .reduceByKey(_ + _)
     .foreach(x => println(s"${x._1} -> ${x._2}"))
-
-
-
-
 }
 

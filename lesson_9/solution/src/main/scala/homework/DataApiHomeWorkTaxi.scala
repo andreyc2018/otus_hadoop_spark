@@ -1,4 +1,4 @@
-package homework2
+package homework
 
 import org.apache.spark.sql.SparkSession
 
