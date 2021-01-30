@@ -17,9 +17,8 @@ object DataApiHomeWorkTaxi extends App {
 
   val taxiFactsDF = spark.read.load("src/main/resources/data/yellow_taxi_jan_25_2018")
   taxiFactsDF.printSchema()
-  taxiFactsDF.show(10)
+  taxiFactsDF.show(5)
   println(taxiFactsDF.count())
-
 
   /**
    * Задание написать код, который будет делать следующее:

@@ -14,13 +14,20 @@ resolvers ++= Seq(
   "MavenRepository" at "https://mvnrepository.com"
 )
 
-
 libraryDependencies ++= Seq(
   "org.apache.spark" %% "spark-core" % sparkVersion,
   "org.apache.spark" %% "spark-sql" % sparkVersion,
   // logging
-  "org.apache.logging.log4j" % "log4j-api" % "2.4.1",
-  "org.apache.logging.log4j" % "log4j-core" % "2.4.1",
+  "ch.qos.logback" % "logback-classic" % "1.2.3",
   // postgres for DB connectivity
   "org.postgresql" % "postgresql" % postgresVersion
 )
+
+scalacOptions += "-deprecation"
+
+assemblyMergeStrategy in assembly := {
+  case "module-info.class" => MergeStrategy.discard
+  case x =>
+    val oldStrategy = (assemblyMergeStrategy in assembly).value
+    oldStrategy(x)
+}
