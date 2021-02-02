@@ -1,24 +1,61 @@
 package homework
 
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.functions.col
 
 object DataApiHomeWorkTaxi extends App {
 
-  val spark = SparkSession.builder()
-    .appName("Joins")
-    .config("spark.master", "local")
-    .getOrCreate()
+  def readStats(path: String, spark: SparkSession): DataFrame = {
+    spark.read.load(path)
+  }
 
-  val driver = "org.postgresql.Driver"
-  val url = "jdbc:postgresql://localhost:5432/otus"
-  val user = "docker"
-  val password = "docker"
+  def readInfo(path: String, spark: SparkSession): DataFrame = {
+    spark.read
+      .option("header", "true")
+      .option("inferSchema", "true")
+      .csv(path)
+  }
+
+  def init(): SparkSession = {
+    SparkSession.builder()
+      .appName("Joins")
+      .config("spark.master", "local")
+      .getOrCreate()
+  }
+
+  def mostPopular(): Unit = {
+    val spark = init()
+
+    val driver = "org.postgresql.Driver"
+    val url = "jdbc:postgresql://localhost:5432/otus"
+    val user = "docker"
+    val password = "docker"
 
 
-  val taxiFactsDF = spark.read.load("src/main/resources/data/yellow_taxi_jan_25_2018")
-  taxiFactsDF.printSchema()
-  taxiFactsDF.show(5)
-  println(taxiFactsDF.count())
+    val taxiFactsDF = readStats("src/main/resources/data/yellow_taxi_jan_25_2018", spark)
+    val taxiInfoDF = readInfo("src/main/resources/data/taxi_zones.csv", spark)
+    taxiFactsDF.printSchema()
+    taxiFactsDF.groupBy(col("PULocationID"))
+      .count().sort(col("count").desc)
+      .join(taxiInfoDF, col("PULocationID") === col("LocationID"))
+      .groupBy(col("Borough"))
+      .count().sort(col("count").desc)
+      .show(15)
+    //  taxiFactsDF.sort(col("PULocationID").desc).show(5)
+    println(taxiFactsDF.groupBy(col("PULocationID")).count())
+    taxiInfoDF.printSchema()
+    taxiInfoDF.show(5)
+  }
+
+//  case class TaxiZone(LocationID:   String,
+//                      Borough:      String,
+//                      Zone:         String,
+//                      service_zone:  String)
+//
+//  val taxiZoneDF = spark.read
+//    .option("header", "true")
+//    .csv("src/main/resources/data/taxi_zones.csv")
+
 
   /**
    * Задание написать код, который будет делать следующее:
@@ -28,5 +65,7 @@ object DataApiHomeWorkTaxi extends App {
    * 3. DataSet: Как происходит распределение заказов? Результат записать в базу данных Postgres.
    */
 
+  //  * 1. DataFrame: Какие районы самые популярные для заказов? Результат в Parquet.
+  mostPopular()
 }
 
