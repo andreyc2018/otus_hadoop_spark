@@ -1,7 +1,7 @@
 package homework
 
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.apache.spark.sql.functions.col
+import org.apache.spark.sql.functions.{col, count, sort_array}
 
 object DataApiHomeWorkTaxi extends App {
 
@@ -26,25 +26,37 @@ object DataApiHomeWorkTaxi extends App {
   def mostPopular(): Unit = {
     val spark = init()
 
-    val driver = "org.postgresql.Driver"
-    val url = "jdbc:postgresql://localhost:5432/otus"
-    val user = "docker"
-    val password = "docker"
+    val taxiFactsDF = readStats("src/main/resources/data/yellow_taxi_jan_25_2018", spark)
+    val taxiInfoDF = readInfo("src/main/resources/data/taxi_zones.csv", spark)
 
+    val mostPopularDF = taxiFactsDF
+      .join(taxiInfoDF, col("PULocationID") <=> col("LocationID"))
+      .groupBy(col("Borough"))
+      .agg(count("*").as("count"))
+      .orderBy(col("count").desc)
+
+    mostPopularDF
+      .repartition(4)
+      .write
+      .mode("overwrite")
+      .parquet("src/main/resources/data/most_popular_pu_location")
+
+    val readBackDF = readStats("src/main/resources/data/most_popular_pu_location", spark)
+    readBackDF.show()
+
+    spark.close()
+  }
+
+  def timeOfMostRequests(): Unit = {
+    val spark = init()
 
     val taxiFactsDF = readStats("src/main/resources/data/yellow_taxi_jan_25_2018", spark)
     val taxiInfoDF = readInfo("src/main/resources/data/taxi_zones.csv", spark)
-    taxiFactsDF.printSchema()
-    taxiFactsDF.groupBy(col("PULocationID"))
-      .count().sort(col("count").desc)
-      .join(taxiInfoDF, col("PULocationID") === col("LocationID"))
-      .groupBy(col("Borough"))
-      .count().sort(col("count").desc)
-      .show(15)
-    //  taxiFactsDF.sort(col("PULocationID").desc).show(5)
-    println(taxiFactsDF.groupBy(col("PULocationID")).count())
-    taxiInfoDF.printSchema()
-    taxiInfoDF.show(5)
+
+    val taxiFactsRDD = taxiFactsDF.rdd
+
+    taxiFactsRDD.foreach(f => println(f))
+    spark.close()
   }
 
 //  case class TaxiZone(LocationID:   String,
@@ -56,6 +68,10 @@ object DataApiHomeWorkTaxi extends App {
 //    .option("header", "true")
 //    .csv("src/main/resources/data/taxi_zones.csv")
 
+//  val driver = "org.postgresql.Driver"
+//  val url = "jdbc:postgresql://localhost:5432/otus"
+//  val user = "docker"
+//  val password = "docker"
 
   /**
    * Задание написать код, который будет делать следующее:
@@ -65,7 +81,10 @@ object DataApiHomeWorkTaxi extends App {
    * 3. DataSet: Как происходит распределение заказов? Результат записать в базу данных Postgres.
    */
 
-  //  * 1. DataFrame: Какие районы самые популярные для заказов? Результат в Parquet.
-  mostPopular()
+  // * 1. DataFrame: Какие районы самые популярные для заказов? Результат в Parquet.
+//  mostPopular()
+
+  // * 2. RDD: В какое время происходит больше всего вызовов? Результат в txt файл c пробелами.
+  timeOfMostRequests()
 }
 

@@ -18,6 +18,14 @@
         <appender-ref ref="console"/>
     </logger>
 
+    <logger name="org.apache.hadoop" level="WARN" additivity="false">
+        <appender-ref ref="console"/>
+    </logger>
+
+    <logger name="org.apache.parquet" level="WARN" additivity="false">
+        <appender-ref ref="console"/>
+    </logger>
+
     <logger name="org.spark_project.jetty" level="WARN" additivity="false">
         <appender-ref ref="console"/>
     </logger>
