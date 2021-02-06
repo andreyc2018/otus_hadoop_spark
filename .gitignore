@@ -1,7 +1,13 @@
-example_repos/**
+# Lessons in progress
+lesson_9
+lesson_11
+lesson_12
 
+# examples that don't need to be in the repo
+example_repos/**
 **/most_popular_pu_location/**
-**/.vscode/
+
+## various config dirs
 **/.bsp/
 **/.metals/
 **/.bloop/
