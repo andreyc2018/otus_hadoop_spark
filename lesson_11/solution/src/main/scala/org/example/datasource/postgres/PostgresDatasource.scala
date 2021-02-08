@@ -62,14 +62,11 @@ class PostgresScanBuilder(options: CaseInsensitiveStringMap) extends ScanBuilder
 case class PostgresPartition(offset: Int, limit: Int) extends InputPartition
 
 class PostgresScan(connectionProperties: ConnectionProperties) extends Scan with Batch {
-  var callCounter = 0
   override def readSchema(): StructType = PostgresTable.schema
 
   override def toBatch: Batch = this
 
   override def planInputPartitions(): Array[InputPartition] = {
-    callCounter += 1
-    println(s"$callCounter: requested partition size: ${connectionProperties.partitionSize}.")
     val connection = DriverManager.getConnection(
       connectionProperties.url, connectionProperties.user, connectionProperties.password
     )
@@ -81,15 +78,10 @@ class PostgresScan(connectionProperties: ConnectionProperties) extends Scan with
     if (rowsCount < 1 || partitionSize < 1) {
       return Array()
     }
-    // val extraPartition = if ((rowsCount % partitionSize) > 0) 1 else 0
-    // var partitionsCount = rowsCount / partitionSize + extraPartition
-    var partitionsCount = rowsCount / partitionSize
-    println(s"$callCounter: will read ${rowsCount} in ${partitionsCount} partitions, ($partitionSize)")
-    (0 to partitionsCount).map(p => {
-      println(s"$callCounter: $p -> offset = ${p*partitionSize}  limit ${partitionSize}")
-    })
-    (0 to partitionsCount).map(p => new PostgresPartition(p*partitionSize, partitionSize)).toArray
-    // Array(PostgresPartition(0, 50))
+    val partitionsCount = rowsCount / partitionSize
+    (0 to partitionsCount).map(
+      p => PostgresPartition(p*partitionSize, partitionSize)
+    ).toArray
   }
 
   override def createReaderFactory(): PartitionReaderFactory = new PostgresPartitionReaderFactory(connectionProperties)
@@ -98,7 +90,6 @@ class PostgresScan(connectionProperties: ConnectionProperties) extends Scan with
 class PostgresPartitionReaderFactory(connectionProperties: ConnectionProperties) extends PartitionReaderFactory {
   override def createReader(partition: InputPartition): PartitionReader[InternalRow] = {
     val p = partition.asInstanceOf[PostgresPartition]
-    println(s"partition = ${partition}, p = $p")
     new PostgresPartitionReader(connectionProperties, p.offset, p.limit)
   }
 }
