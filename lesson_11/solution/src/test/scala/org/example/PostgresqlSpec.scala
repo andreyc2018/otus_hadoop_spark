@@ -23,9 +23,6 @@ class PostgresqlSpec extends AnyFlatSpec with TestContainerForAll {
       extraPartition = if ((recordsUnderTest % partitionSize) > 0) 1 else 0
       expectedPartitions = recordsUnderTest / partitionSize + extraPartition
     }
-//    val expectedPartitions =
-//      if ((recordsUnderTest%partitionSize) > 0) recordsUnderTest/partitionSize + 1
-//      else recordsUnderTest/partitionSize
 
     val df = spark
       .read
