@@ -59,36 +59,57 @@ class PostgresScanBuilder(options: CaseInsensitiveStringMap) extends ScanBuilder
   ))
 }
 
-class PostgresPartition extends InputPartition
+case class PostgresPartition(offset: Int, limit: Int) extends InputPartition
 
 class PostgresScan(connectionProperties: ConnectionProperties) extends Scan with Batch {
+  var callCounter = 0
   override def readSchema(): StructType = PostgresTable.schema
 
   override def toBatch: Batch = this
 
-  override def planInputPartitions(): Array[InputPartition] = Array(new PostgresPartition)
+  override def planInputPartitions(): Array[InputPartition] = {
+    callCounter += 1
+    println(s"$callCounter: requested partition size: ${connectionProperties.partitionSize}.")
+    val connection = DriverManager.getConnection(
+      connectionProperties.url, connectionProperties.user, connectionProperties.password
+    )
+    val getRows = connection.createStatement()
+    val rows = getRows.executeQuery(s"select count(*) from ${connectionProperties.tableName}")
+    rows.next()
+    val rowsCount = rows.getInt("count")
+    val partitionSize = connectionProperties.partitionSize
+    if (rowsCount < 1 || partitionSize < 1) {
+      return Array()
+    }
+    // val extraPartition = if ((rowsCount % partitionSize) > 0) 1 else 0
+    // var partitionsCount = rowsCount / partitionSize + extraPartition
+    var partitionsCount = rowsCount / partitionSize
+    println(s"$callCounter: will read ${rowsCount} in ${partitionsCount} partitions, ($partitionSize)")
+    (0 to partitionsCount).map(p => {
+      println(s"$callCounter: $p -> offset = ${p*partitionSize}  limit ${partitionSize}")
+    })
+    (0 to partitionsCount).map(p => new PostgresPartition(p*partitionSize, partitionSize)).toArray
+    // Array(PostgresPartition(0, 50))
+  }
 
   override def createReaderFactory(): PartitionReaderFactory = new PostgresPartitionReaderFactory(connectionProperties)
 }
 
 class PostgresPartitionReaderFactory(connectionProperties: ConnectionProperties) extends PartitionReaderFactory {
   override def createReader(partition: InputPartition): PartitionReader[InternalRow] = {
-    println(s"partition = ${partition}")
-    new PostgresPartitionReader(connectionProperties)
+    val p = partition.asInstanceOf[PostgresPartition]
+    println(s"partition = ${partition}, p = $p")
+    new PostgresPartitionReader(connectionProperties, p.offset, p.limit)
   }
 }
 
-class PostgresPartitionReader(connectionProperties: ConnectionProperties) extends PartitionReader[InternalRow] {
+class PostgresPartitionReader(connectionProperties: ConnectionProperties, offset: Int, limit: Int) extends PartitionReader[InternalRow] {
   private val connection = DriverManager.getConnection(
     connectionProperties.url, connectionProperties.user, connectionProperties.password
   )
-  val getRows = connection.createStatement()
-  val rows = getRows.executeQuery(s"select count(*) from ${connectionProperties.tableName}")
-  rows.next()
-  println(s"will read ${rows.getLong(1)} in ${connectionProperties.partitionSize} partitions")
 
   private val statement = connection.createStatement()
-  private val resultSet = statement.executeQuery(s"select * from ${connectionProperties.tableName} ")
+  private val resultSet = statement.executeQuery(s"select * from ${connectionProperties.tableName} offset $offset limit $limit")
 
   override def next(): Boolean = resultSet.next()
 

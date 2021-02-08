@@ -21,6 +21,11 @@ class PostgresqlSpec extends AnyFlatSpec with TestContainerForAll {
       .appName("PostgresReaderJob")
       .getOrCreate()
 
+    val partitionSize = 60
+    val recordsUnderTest = 50
+    val expectedPartitions =
+      if ((recordsUnderTest%partitionSize) > 0) recordsUnderTest/partitionSize + 1
+      else recordsUnderTest/partitionSize
     val df = spark
       .read
       .format("org.example.datasource.postgres")
@@ -28,14 +33,15 @@ class PostgresqlSpec extends AnyFlatSpec with TestContainerForAll {
       .option("user", postgresServer.username)
       .option("password", postgresServer.password)
       .option("tableName", testTableName)
-      .option("partitionSize", "5")
+      .option("partitionSize", partitionSize)
       .load()
-      .repartition(5)
 
-    df.show()
-    println(s"P Count = ${df.rdd.getNumPartitions}")
-
+    df.show(60)
     spark.stop()
+
+    println(s"P Count = ${df.rdd.getNumPartitions}")
+    println(s"${50/partitionSize} + ${(50%partitionSize)}")
+    assert(df.rdd.getNumPartitions == expectedPartitions)
   }
 
   "PostgreSQL data source" should "write table" in withContainers { postgresServer =>
@@ -56,6 +62,7 @@ class PostgresqlSpec extends AnyFlatSpec with TestContainerForAll {
       .option("user", postgresServer.username)
       .option("password", postgresServer.password)
       .option("tableName", testTableName)
+      .option("partitionSize", 1)
       .mode(SaveMode.Append)
       .save()
 
