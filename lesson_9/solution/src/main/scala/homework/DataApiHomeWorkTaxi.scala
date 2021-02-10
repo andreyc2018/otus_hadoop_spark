@@ -1,9 +1,19 @@
 package homework
 
+import org.apache.spark.sql.execution.streaming.FileStreamSource.Timestamp
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.apache.spark.sql.functions.{col, count, sort_array}
+import org.apache.spark.sql.functions.{col, count, hour, sort_array}
+
+import scala.reflect.internal.util.TableDef.Column
 
 object DataApiHomeWorkTaxi extends App {
+
+  def init(): SparkSession = {
+    SparkSession.builder()
+      .appName("Homework #9")
+      .config("spark.master", "local")
+      .getOrCreate()
+  }
 
   def readStats(path: String, spark: SparkSession): DataFrame = {
     spark.read.load(path)
@@ -14,13 +24,6 @@ object DataApiHomeWorkTaxi extends App {
       .option("header", "true")
       .option("inferSchema", "true")
       .csv(path)
-  }
-
-  def init(): SparkSession = {
-    SparkSession.builder()
-      .appName("Joins")
-      .config("spark.master", "local")
-      .getOrCreate()
   }
 
   def mostPopular(): Unit = {
@@ -55,7 +58,16 @@ object DataApiHomeWorkTaxi extends App {
 
     val taxiFactsRDD = taxiFactsDF.rdd
 
-    taxiFactsRDD.foreach(f => println(f))
+    println(s"first = ${taxiFactsRDD.first()(1)}")
+    println(s"first = ${taxiFactsRDD.first()(1).asInstanceOf[java.sql.Timestamp]}")
+    println(s"first = ${taxiFactsRDD.first()(1).asInstanceOf[java.sql.Timestamp].getHours}")
+//    println(s"schema = ${taxiFactsRDD}")
+    val rdd = taxiFactsRDD
+      .groupBy(f => (f(1).asInstanceOf[java.sql.Timestamp].getHours))
+
+    rdd
+      .foreach(f => println(f))
+
     spark.close()
   }
 
