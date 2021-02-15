@@ -18,7 +18,8 @@ libraryDependencies ++= Seq(
   "org.apache.spark" %% "spark-core" % sparkVersion,
   "org.apache.spark" %% "spark-sql" % sparkVersion,
   // logging
-  "ch.qos.logback" % "logback-classic" % "1.2.3",
+//  disabled logback after putting log4j.properties to src/main/resources
+//  "ch.qos.logback" % "logback-classic" % "1.2.3",
   // postgres for DB connectivity
   "org.postgresql" % "postgresql" % postgresVersion
 )
