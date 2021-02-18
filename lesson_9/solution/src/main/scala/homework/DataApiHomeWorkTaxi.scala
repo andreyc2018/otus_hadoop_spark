@@ -5,6 +5,7 @@ import org.apache.spark.sql.functions.{col, count, hour, sort_array}
 
 import java.io.File
 import java.io.PrintWriter
+import scala.reflect.io.Directory
 
 object DataApiHomeWorkTaxi extends App {
 
@@ -34,8 +35,7 @@ object DataApiHomeWorkTaxi extends App {
 
     val mostPopularDF = taxiFactsDF
       .join(taxiInfoDF, col("PULocationID") <=> col("LocationID"))
-      .groupBy(col("Borough"))
-      .agg(count("*").as("count"))
+      .groupBy(col("Borough")).count
       .orderBy(col("count").desc)
 
     mostPopularDF
@@ -48,13 +48,6 @@ object DataApiHomeWorkTaxi extends App {
     readBackDF.show()
 
     spark.close()
-  }
-
-  def writeHoursToFile(filename: String, lines: Seq[(Int, Int)]): Unit = {
-    val writer = new PrintWriter(new File(filename))
-    writer.write("Часы : Количество вызовов\n")
-    lines.foreach(line => writer.write(s"${line._1} - ${line._1 + 1} : ${line._2}\n"))
-    writer.close()
   }
 
   def timeOfMostRequests(): Unit = {
@@ -70,8 +63,13 @@ object DataApiHomeWorkTaxi extends App {
       .reduceByKey((a, b) => a + b)
       .sortBy(p => p._2, false)
 
-    val dataToWrite = timesRDD.collect()
-    writeHoursToFile("src/main/resources/data/times_of_most_requests.txt", dataToWrite)
+    val dataToWrite = timesRDD.map(p => (p._1.toString + " - " + (p._1 + 1).toString + " : " + p._2.toString))
+
+    val destDir = "src/main/resources/data/times_of_most_requests"
+    val dir = new Directory(new File(destDir))
+    dir.deleteRecursively()
+    dataToWrite.repartition(1).saveAsTextFile(destDir)
+
     spark.close()
   }
 
