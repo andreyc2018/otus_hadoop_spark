@@ -1,7 +1,10 @@
 package homework
 
 import homework.DataApiHomeWorkTaxi.readStats
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql
+import org.apache.spark.sql.{DataFrame, SparkSession}
+
+import java.awt.image.DataBuffer
 
 object CreateSubset extends App {
   def init(): SparkSession = {
@@ -14,8 +17,10 @@ object CreateSubset extends App {
 
   val spark = init()
 
-  val taxiFactsDF =
+  val taxiFactsDF: DataFrame =
     readStats("src/main/resources/data/yellow_taxi_jan_25_2018", spark)
+
+  taxiFactsDF.printSchema()
 
   val mostPopularDF = taxiFactsDF
     .limit(10)
