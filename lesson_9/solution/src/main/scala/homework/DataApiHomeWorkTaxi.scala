@@ -4,7 +4,10 @@ import org.apache.spark.sql.execution.streaming.FileStreamSource.Timestamp
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.functions.{col, count, hour, sort_array}
 
+import java.io.{BufferedOutputStream, BufferedWriter, FileOutputStream, FileWriter, PrintWriter}
 import scala.reflect.internal.util.TableDef.Column
+import java.io.File
+import java.io.PrintWriter
 
 object DataApiHomeWorkTaxi extends App {
 
@@ -50,27 +53,35 @@ object DataApiHomeWorkTaxi extends App {
     spark.close()
   }
 
+  def writeFile(filename: String, lines: Seq[(Int, Int)]): Unit = {
+    val writer = new PrintWriter(new File(filename))
+    writer.write("Часы : Количество вызовов\n")
+    for (line <- lines) {
+      writer.write(s"${line._1} - ${line._1 + 1} : ${line._2}\n")
+    }
+    writer.close()
+  }
+
   def timeOfMostRequests(): Unit = {
     val spark = init()
 
     // val taxiFactsDF = readStats("src/main/resources/data/small_set", spark)
     val taxiFactsDF = readStats("src/main/resources/data/yellow_taxi_jan_25_2018", spark)
-    // val taxiInfoDF = readInfo("src/main/resources/data/taxi_zones.csv", spark)
 
     val taxiFactsRDD = taxiFactsDF.rdd
 
-    // println(s"first = ${taxiFactsRDD.first()(1)}")
-    // println(s"first = ${taxiFactsRDD.first()(1).asInstanceOf[java.sql.Timestamp]}")
-    // println(s"first = ${taxiFactsRDD.first()(1).asInstanceOf[java.sql.Timestamp].getHours}")
-//    println(s"schema = ${taxiFactsRDD}")
-    taxiFactsRDD.take(15).map(f => println(f))
-    val rdd = taxiFactsRDD.map(f => f(1).asInstanceOf[java.sql.Timestamp].getHours)
-    rdd.take(15).foreach(f => println(f))
-    val pairs = rdd.map(f => (f, 1))
-    pairs.take(15).foreach(f => println(f))
-    val counts = pairs.reduceByKey((a, b) => a + b).sortBy(p => p._2, false).collect()
-    counts.take(24).foreach(f => println(f))
+    val timesRDD = taxiFactsRDD
+      .map(f => f(1).asInstanceOf[java.sql.Timestamp].getHours)
+      .map(f => (f, 1))
+      .reduceByKey((a, b) => a + b)
+      .sortBy(p => p._2, false)
+//      .map(p => (p._1.toString + ", " + p._2.toString))
 
+    val dataToWrite = timesRDD.collect()
+    writeFile("src/main/resources/data/times_of_most_requests.txt", dataToWrite)
+//    println(dataToSave.getClass)
+//    timesRDD.repartition(1).saveAsTextFile("src/main/resources/data/times_of_most_requests.txt")
+//    timesRDD.take(15).foreach(f => println(f))
     spark.close()
   }
 
