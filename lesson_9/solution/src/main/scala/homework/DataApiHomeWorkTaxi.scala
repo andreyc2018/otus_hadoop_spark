@@ -1,11 +1,8 @@
 package homework
 
-import org.apache.spark.sql.execution.streaming.FileStreamSource.Timestamp
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.functions.{col, count, hour, sort_array}
 
-import java.io.{BufferedOutputStream, BufferedWriter, FileOutputStream, FileWriter, PrintWriter}
-import scala.reflect.internal.util.TableDef.Column
 import java.io.File
 import java.io.PrintWriter
 
@@ -53,19 +50,16 @@ object DataApiHomeWorkTaxi extends App {
     spark.close()
   }
 
-  def writeFile(filename: String, lines: Seq[(Int, Int)]): Unit = {
+  def writeHoursToFile(filename: String, lines: Seq[(Int, Int)]): Unit = {
     val writer = new PrintWriter(new File(filename))
     writer.write("Часы : Количество вызовов\n")
-    for (line <- lines) {
-      writer.write(s"${line._1} - ${line._1 + 1} : ${line._2}\n")
-    }
+    lines.foreach(line => writer.write(s"${line._1} - ${line._1 + 1} : ${line._2}\n"))
     writer.close()
   }
 
   def timeOfMostRequests(): Unit = {
     val spark = init()
 
-    // val taxiFactsDF = readStats("src/main/resources/data/small_set", spark)
     val taxiFactsDF = readStats("src/main/resources/data/yellow_taxi_jan_25_2018", spark)
 
     val taxiFactsRDD = taxiFactsDF.rdd
@@ -75,29 +69,11 @@ object DataApiHomeWorkTaxi extends App {
       .map(f => (f, 1))
       .reduceByKey((a, b) => a + b)
       .sortBy(p => p._2, false)
-//      .map(p => (p._1.toString + ", " + p._2.toString))
 
     val dataToWrite = timesRDD.collect()
-    writeFile("src/main/resources/data/times_of_most_requests.txt", dataToWrite)
-//    println(dataToSave.getClass)
-//    timesRDD.repartition(1).saveAsTextFile("src/main/resources/data/times_of_most_requests.txt")
-//    timesRDD.take(15).foreach(f => println(f))
+    writeHoursToFile("src/main/resources/data/times_of_most_requests.txt", dataToWrite)
     spark.close()
   }
-
-//  case class TaxiZone(LocationID:   String,
-//                      Borough:      String,
-//                      Zone:         String,
-//                      service_zone:  String)
-//
-//  val taxiZoneDF = spark.read
-//    .option("header", "true")
-//    .csv("src/main/resources/data/taxi_zones.csv")
-
-//  val driver = "org.postgresql.Driver"
-//  val url = "jdbc:postgresql://localhost:5432/otus"
-//  val user = "docker"
-//  val password = "docker"
 
   /**
    * Задание написать код, который будет делать следующее:
@@ -108,9 +84,11 @@ object DataApiHomeWorkTaxi extends App {
    */
 
   // * 1. DataFrame: Какие районы самые популярные для заказов? Результат в Parquet.
-//  mostPopular()
+  mostPopular()
 
   // * 2. RDD: В какое время происходит больше всего вызовов? Результат в txt файл c пробелами.
   timeOfMostRequests()
+
+  // * 3. DataSet: Как происходит распределение заказов? Результат записать в базу данных Postgres.
 }
 
