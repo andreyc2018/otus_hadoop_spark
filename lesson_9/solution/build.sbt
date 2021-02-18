@@ -32,3 +32,5 @@ assemblyMergeStrategy in assembly := {
     val oldStrategy = (assemblyMergeStrategy in assembly).value
     oldStrategy(x)
 }
+
+mainClass in (Compile, run) := Some("homework.DataApiHomeWorkTaxi")
