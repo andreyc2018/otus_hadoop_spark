@@ -13,15 +13,14 @@ object KafkaClient extends App {
   val inputFile = args(0)
   try {
     Writer.fromFile(inputFile, "books")
+    Thread.sleep(3000)
     val records = Reader.readFrom("books")
     records.foreach(p => {
       println(s"Partition ${p._1}")
       printPartition(p._2)
     })
-
   } catch {
-    case e: FileNotFoundException => { println(s"Error: ${e.getMessage}")}
-    case e: Exception => { println(s"Error: ${e.getMessage}")}
+    case e: Throwable => println(s"Error: ${e.getMessage}")
   }
 
   private def printRecord(record: BookRecord): Unit = {
