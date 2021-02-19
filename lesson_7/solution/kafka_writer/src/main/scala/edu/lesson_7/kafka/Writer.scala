@@ -20,14 +20,14 @@ object Writer {
     val props = new Properties()
     props.put("bootstrap.servers", "localhost:29092")
     val producer = new KafkaProducer(props, new LongSerializer, new StringSerializer)
-    var counter = 0
     val bufferedSource = io.Source.fromFile(filename)
-    bufferedSource.getLines().drop(1).foreach(line => {
+    bufferedSource.getLines().drop(1).zipWithIndex.foreach(idx_line => {
+      val line = idx_line._1
+      val counter = idx_line._2
       val dataToWrite = lineToJson(line)
       val data = Json.stringify(dataToWrite)
       val key = Instant.now.toEpochMilli + counter
       producer.send(new ProducerRecord(topic, key, data))
-      counter += 1
     })
 
     producer.close()
