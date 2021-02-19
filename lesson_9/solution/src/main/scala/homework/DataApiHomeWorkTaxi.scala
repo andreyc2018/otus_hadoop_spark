@@ -1,11 +1,9 @@
 package homework
 
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.apache.spark.sql.functions.{col, count, hour, sort_array}
+import org.apache.spark.sql.functions.col
 
-import java.io.File
-import java.io.PrintWriter
-import scala.reflect.io.Directory
+import org.apache.hadoop.fs.Path
 
 object DataApiHomeWorkTaxi extends App {
 
@@ -68,12 +66,16 @@ object DataApiHomeWorkTaxi extends App {
       .reduceByKey((a, b) => a + b)
       .sortBy(p => p._2, false)
 
-    val dataToWrite = timesRDD.map(p => (p._1.toString + " - " + (p._1 + 1).toString + " : " + p._2.toString))
+    val dataToWrite = timesRDD.map(p => s"${p._1} - ${p._1 + 1} : ${p._2}")
 
     val destDir = "src/main/resources/data/times_of_most_requests"
-    val dir = new Directory(new File(destDir))
-    dir.deleteRecursively()
+
+    val fs = org.apache.hadoop.fs.FileSystem.get(spark.sparkContext.hadoopConfiguration)
+    if (fs.exists(new org.apache.hadoop.fs.Path(destDir)))
+      fs.delete(new Path(destDir), true)
+
     dataToWrite.repartition(1).saveAsTextFile(destDir)
+    println(dataToWrite.first())
 
     spark.close()
   }
