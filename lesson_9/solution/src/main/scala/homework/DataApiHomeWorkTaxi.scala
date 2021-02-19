@@ -28,6 +28,9 @@ object DataApiHomeWorkTaxi extends App {
   }
 
   def mostPopular(): Unit = {
+
+    println("DataFrame: Какие районы самые популярные для заказов?")
+
     val spark = init()
 
     val taxiFactsDF = readStats("src/main/resources/data/yellow_taxi_jan_25_2018", spark)
@@ -51,6 +54,8 @@ object DataApiHomeWorkTaxi extends App {
   }
 
   def timeOfMostRequests(): Unit = {
+
+    println("RDD: В какое время происходит больше всего вызовов?")
     val spark = init()
 
     val taxiFactsDF = readStats("src/main/resources/data/yellow_taxi_jan_25_2018", spark)
@@ -73,6 +78,13 @@ object DataApiHomeWorkTaxi extends App {
     spark.close()
   }
 
+  def orderDistribution(): Unit = {
+
+    println("DataSet: Как происходит распределение заказов?")
+    val spark = init()
+
+    spark.close()
+  }
   /**
    * Задание написать код, который будет делать следующее:
    *
@@ -88,5 +100,6 @@ object DataApiHomeWorkTaxi extends App {
   timeOfMostRequests()
 
   // * 3. DataSet: Как происходит распределение заказов? Результат записать в базу данных Postgres.
+  orderDistribution()
 }
 
