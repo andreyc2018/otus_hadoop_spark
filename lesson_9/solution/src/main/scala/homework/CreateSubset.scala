@@ -22,14 +22,20 @@ object CreateSubset extends App {
 
   taxiFactsDF.printSchema()
 
-  val mostPopularDF = taxiFactsDF
-    .limit(10)
+  val smallDF = taxiFactsDF.limit(10)
 
-  mostPopularDF
+  smallDF
     .write
     .mode("overwrite")
     .parquet("src/main/resources/data/small_set")
 
   val readBackDF = readStats("src/main/resources/data/small_set", spark)
   readBackDF.show()
+
+  smallDF
+    .limit(1)
+    .coalesce(1)
+    .write.format("csv")
+    .option("header", "true")
+    .save("src/main/resources/data/taxi_info_small")
 }

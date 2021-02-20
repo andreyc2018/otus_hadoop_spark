@@ -1,24 +1,29 @@
 package homework
 
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions.col
 
 import org.apache.hadoop.fs.Path
 
 object DataApiHomeWorkTaxi extends App {
 
+  val taxiFactsFile      = "src/main/resources/data/yellow_taxi_jan_25_2018"
+  val taxiInfoFile       = "src/main/resources/data/taxi_zones.csv"
+  val smallTaxiFactsFile = "src/main/resources/data/small_set"
+
   def init(): SparkSession = {
-    SparkSession.builder()
+    SparkSession
+      .builder()
       .appName("Homework #9")
       .config("spark.master", "local")
       .getOrCreate()
   }
 
-  def readStats(path: String, spark: SparkSession): DataFrame = {
+  def readStats(path: String, spark: SparkSession) = {
     spark.read.load(path)
   }
 
-  def readInfo(path: String, spark: SparkSession): DataFrame = {
+  def readInfo(path: String, spark: SparkSession) = {
     spark.read
       .option("header", "true")
       .option("inferSchema", "true")
@@ -31,12 +36,13 @@ object DataApiHomeWorkTaxi extends App {
 
     val spark = init()
 
-    val taxiFactsDF = readStats("src/main/resources/data/yellow_taxi_jan_25_2018", spark)
-    val taxiInfoDF = readInfo("src/main/resources/data/taxi_zones.csv", spark)
+    val taxiFactsDF = readStats(taxiFactsFile, spark)
+    val taxiInfoDF  = readInfo(taxiInfoFile, spark)
 
     val mostPopularDF = taxiFactsDF
       .join(taxiInfoDF, col("PULocationID") <=> col("LocationID"))
-      .groupBy(col("Borough")).count
+      .groupBy(col("Borough"))
+      .count
       .orderBy(col("count").desc)
 
     mostPopularDF
@@ -56,7 +62,7 @@ object DataApiHomeWorkTaxi extends App {
     println("RDD: В какое время происходит больше всего вызовов?")
     val spark = init()
 
-    val taxiFactsDF = readStats("src/main/resources/data/yellow_taxi_jan_25_2018", spark)
+    val taxiFactsDF = readStats(taxiFactsFile, spark)
 
     val taxiFactsRDD = taxiFactsDF.rdd
 
@@ -83,25 +89,62 @@ object DataApiHomeWorkTaxi extends App {
   def orderDistribution(): Unit = {
 
     println("DataSet: Как происходит распределение заказов?")
-    val spark = init()
+    // val spark = init()
+    val sparkSession = SparkSession
+      .builder()
+      .appName("Introduction to RDDs")
+      .config("spark.master", "local")
+      .getOrCreate()
+    // case class TaxiFacts(
+    //     VendorID: Int,
+    //     tpep_pickup_datetime: String,
+    //     tpep_dropoff_datetime: String,
+    //     passenger_count: Int,
+    //     trip_distance: Double,
+    //     RatecodeID: Int,
+    //     store_and_fwd_flag: String,
+    //     PULocationID: Int,
+    //     DOLocationID: Int,
+    //     payment_type: Int,
+    //     fare_amount: Double,
+    //     extra: Double,
+    //     mta_tax: Double,
+    //     tip_amount: Double,
+    //     tolls_amount: Double,
+    //     improvement_surcharge: Double,
+    //     total_amount: Double
+    // )
 
-    spark.close()
+    // val taxiFactsDF = readStats(smallTaxiFactsFile, spark)
+    val taxiFactsDF = sparkSession.read.load("src/main/resources/data/small_set")
+  case class TaxiZone()
+
+    // taxiFactsDF.schema()
+    taxiFactsDF.show(1)
+    // import sparkSession.implicits._
+    import sparkSession.implicits._
+
+    // case class TaxiFacts()
+//    val taxiFactsDS = taxiFactsDF.as[TaxiZone]
+
+    // val taxiFactsDS = taxiFactsDF.as[TaxiFacts]
+    // taxiFactsDS.show(1)
+    sparkSession.close()
   }
-  /**
-   * Задание написать код, который будет делать следующее:
-   *
-   * 1. DataFrame: Какие районы самые популярные для заказов? Результат в Parquet.
-   * 2. RDD: В какое время происходит больше всего вызовов? Результат в txt файл c пробелами.
-   * 3. DataSet: Как происходит распределение заказов? Результат записать в базу данных Postgres.
-   */
+
+  /** Задание написать код, который будет делать следующее:
+    *
+    * 1. DataFrame: Какие районы самые популярные для заказов? Результат в Parquet.
+    * 2. RDD: В какое время происходит больше всего вызовов? Результат в txt файл c пробелами.
+    * 3. DataSet: Как происходит распределение заказов? Результат записать в базу данных Postgres.
+    */
 
   // * 1. DataFrame: Какие районы самые популярные для заказов? Результат в Parquet.
-  mostPopular()
+  // mostPopular()
 
   // * 2. RDD: В какое время происходит больше всего вызовов? Результат в txt файл c пробелами.
-  timeOfMostRequests()
+  // timeOfMostRequests()
 
   // * 3. DataSet: Как происходит распределение заказов? Результат записать в базу данных Postgres.
   orderDistribution()
 }
-
