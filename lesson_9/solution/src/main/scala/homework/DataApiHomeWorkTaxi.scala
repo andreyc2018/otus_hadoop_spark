@@ -1,8 +1,7 @@
 package homework
 
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.functions.col
-
 import org.apache.hadoop.fs.Path
 
 object DataApiHomeWorkTaxi extends App {
@@ -19,11 +18,11 @@ object DataApiHomeWorkTaxi extends App {
       .getOrCreate()
   }
 
-  def readStats(path: String, spark: SparkSession) = {
+  def readStats(path: String, spark: SparkSession): DataFrame = {
     spark.read.load(path)
   }
 
-  def readInfo(path: String, spark: SparkSession) = {
+  def readInfo(path: String, spark: SparkSession): DataFrame = {
     spark.read
       .option("header", "true")
       .option("inferSchema", "true")

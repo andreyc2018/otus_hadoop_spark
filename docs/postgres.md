@@ -1,0 +1,2 @@
+ psql -U docker
+ \d

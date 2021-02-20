@@ -3,9 +3,11 @@ DROP DATABASE IF EXISTS otus;
 CREATE DATABASE otus;
 
 
-
-CREATE TABLE pickup_by_hour (
-hour_of_day           INT,
-total_trips           INT
+CREATE TABLE trip_stats (
+    trips    INT,
+    avg_dist REAL,
+    max_dist REAL,
+    min_dist REAL,
+    stddev   REAL
 );
 
