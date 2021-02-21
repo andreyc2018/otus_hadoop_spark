@@ -4,6 +4,8 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.functions.col
 import org.apache.hadoop.fs.Path
 
+import java.sql.Timestamp
+
 object DataApiHomeWorkTaxi extends App {
 
   val taxiFactsFile      = "src/main/resources/data/yellow_taxi_jan_25_2018"
@@ -85,50 +87,37 @@ object DataApiHomeWorkTaxi extends App {
     spark.close()
   }
 
+  case class TaxiFacts(
+                        VendorID: Int,
+                        tpep_pickup_datetime: Timestamp,
+                        tpep_dropoff_datetime: Timestamp,
+                        passenger_count: Int,
+                        trip_distance: Double,
+                        RatecodeID: Int,
+                        store_and_fwd_flag: String,
+                        PULocationID: Int,
+                        DOLocationID: Int,
+                        payment_type: Int,
+                        fare_amount: Double,
+                        extra: Double,
+                        mta_tax: Double,
+                        tip_amount: Double,
+                        tolls_amount: Double,
+                        improvement_surcharge: Double,
+                        total_amount: Double
+                      )
+
   def orderDistribution(): Unit = {
 
     println("DataSet: Как происходит распределение заказов?")
-    // val spark = init()
-    val sparkSession = SparkSession
-      .builder()
-      .appName("Introduction to RDDs")
-      .config("spark.master", "local")
-      .getOrCreate()
-    // case class TaxiFacts(
-    //     VendorID: Int,
-    //     tpep_pickup_datetime: String,
-    //     tpep_dropoff_datetime: String,
-    //     passenger_count: Int,
-    //     trip_distance: Double,
-    //     RatecodeID: Int,
-    //     store_and_fwd_flag: String,
-    //     PULocationID: Int,
-    //     DOLocationID: Int,
-    //     payment_type: Int,
-    //     fare_amount: Double,
-    //     extra: Double,
-    //     mta_tax: Double,
-    //     tip_amount: Double,
-    //     tolls_amount: Double,
-    //     improvement_surcharge: Double,
-    //     total_amount: Double
-    // )
+    val spark = init()
 
-    // val taxiFactsDF = readStats(smallTaxiFactsFile, spark)
-    val taxiFactsDF = sparkSession.read.load("src/main/resources/data/small_set")
-  case class TaxiZone()
+    val taxiFactsDF = spark.read.load("src/main/resources/data/yellow_taxi_jan_25_2018")
+    import spark.implicits._
 
-    // taxiFactsDF.schema()
-    taxiFactsDF.show(1)
-    // import sparkSession.implicits._
-    import sparkSession.implicits._
+    val taxiFactsDS = taxiFactsDF.as[TaxiFacts]
 
-    // case class TaxiFacts()
-//    val taxiFactsDS = taxiFactsDF.as[TaxiZone]
-
-    // val taxiFactsDS = taxiFactsDF.as[TaxiFacts]
-    // taxiFactsDS.show(1)
-    sparkSession.close()
+    spark.close()
   }
 
   /** Задание написать код, который будет делать следующее:
