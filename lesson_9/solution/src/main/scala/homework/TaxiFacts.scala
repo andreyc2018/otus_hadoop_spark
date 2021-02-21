@@ -18,5 +18,6 @@ final case class TaxiFacts(
     tip_amount: Double,
     tolls_amount: Double,
     improvement_surcharge: Double,
-    total_amount: Double
+    total_amount: Double,
+    Hour: Int
 )

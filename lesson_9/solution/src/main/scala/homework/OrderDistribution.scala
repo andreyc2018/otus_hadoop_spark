@@ -15,7 +15,6 @@ object OrderDistribution extends App {
     .config("spark.master", "local")
     .getOrCreate()
 
-//     case class TaxiFacts()
   case class TaxiFacts(
       VendorID: Int,
       tpep_pickup_datetime: Timestamp,
@@ -33,13 +32,20 @@ object OrderDistribution extends App {
       tip_amount: Double,
       tolls_amount: Double,
       improvement_surcharge: Double,
-      total_amount: Double
+      total_amount: Double,
+      Hour: Int
   )
 
   val taxiFactsDF = sparkSession.read.load("src/main/resources/data/yellow_taxi_jan_25_2018")
+
+  val tsHour: (Timestamp) => Int = (ts: Timestamp) => { ts.getHours }
+
+  val tsHourUDF = udf(tsHour)
+  val output = taxiFactsDF.withColumn("Hour",tsHourUDF(taxiFactsDF.col("tpep_pickup_datetime")))
+  // output.show(5)
   import sparkSession.implicits._
 
-  val taxiFactsDS = taxiFactsDF.as[TaxiFacts]
+  val taxiFactsDS = output.as[TaxiFacts]
 //  val taxiFactsPerHourDS = taxiFactsDS.withColumn("Hour", s"${_.tpep_pickup_datetime.getHours}")
 //  taxiFactsDS.show(1)
 //  taxiFactsDS.printSchema()
@@ -53,29 +59,28 @@ object OrderDistribution extends App {
 //  totalTrips.printSchema()
 //  totalTrips.show()
 
-  val tripsStats: DataFrame = taxiFactsDS.agg(
+  val tripsStats = taxiFactsDS.groupBy("Hour").agg(
     count("trip_distance").name("trips"),
     avg("trip_distance").name("avg_dist"),
     max("trip_distance").name("max_dist"),
     min("trip_distance").name("min_dist"),
     stddev("trip_distance").name("stddev_dist")
   )
-  tripsStats.show()
+  // tripsStats.show()
 
   // The following if/else does the same using conf file approach and inline Map approach
   // The conf file is more usefull because all parameters are defined outside of the source code.
   val useDbConf = false
   if (useDbConf) {
     val dbProperties = new Properties
-    val confFile = "src/main/resources/db-properties.conf"
+    val confFile     = "src/main/resources/db-properties.conf"
     dbProperties.load(new FileInputStream(new File(confFile)));
     val jdbcUrl = dbProperties.getProperty("jdbcUrl")
-    val where = "trip_stats"
+    val where   = "trip_stats"
     tripsStats.write.mode("overwrite").jdbc(jdbcUrl, where, dbProperties)
     val showDF = sparkSession.read.jdbc(jdbcUrl, where, dbProperties)
     showDF.show()
-  }
-  else {
+  } else {
     val opts = Map(
       "url"      -> "jdbc:postgresql://localhost:5432/otus",
       "dbtable"  -> "trip_stats",
@@ -85,10 +90,8 @@ object OrderDistribution extends App {
     tripsStats.write.mode("overwrite").format("jdbc").options(opts).save()
 
     val showDF = sparkSession.read.format("jdbc").options(opts).load()
-    showDF.show()
+    showDF.orderBy("hour").show(23)
   }
-
-
 
   //  val perHourDS = taxiFactsDS
 //    .groupByKey(d => d.tpep_pickup_datetime.getHours)
