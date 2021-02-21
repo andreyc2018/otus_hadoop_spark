@@ -6,6 +6,7 @@ lesson_16
 # lesson_9 ignores
 taxi_info_1.csv
 taxi_info_small.csv
+times_of_most_requests
 
 # examples that don't need to be in the repo
 example_repos/**

@@ -33,4 +33,4 @@ assemblyMergeStrategy in assembly := {
 // mainClass in (Compile, run) := Some("homework.DataApiHomeWorkTaxi")
 // mainClass in (Compile, run) := Some("homework.CreateSubset")
 // mainClass in (Compile, run) := Some("lesson.OtusDataFrameDataSet")
-mainClass in (Compile, run) := Some("lesson.OrderDistribution")
+// mainClass in (Compile, run) := Some("lesson.OrderDistribution")
