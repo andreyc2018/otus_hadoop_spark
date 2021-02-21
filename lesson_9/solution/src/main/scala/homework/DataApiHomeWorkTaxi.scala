@@ -1,7 +1,7 @@
 package homework
 
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.apache.spark.sql.functions.col
+import org.apache.spark.sql.functions._
 import org.apache.hadoop.fs.Path
 
 import java.sql.Timestamp
@@ -68,7 +68,7 @@ object DataApiHomeWorkTaxi extends App {
     val taxiFactsRDD = taxiFactsDF.rdd
 
     val timesRDD = taxiFactsRDD
-      .map(f => f(1).asInstanceOf[java.sql.Timestamp].getHours)
+      .map(f => f(1).asInstanceOf[Timestamp].getHours)
       .map(f => (f, 1))
       .reduceByKey((a, b) => a + b)
       .sortBy(p => p._2, false)
@@ -87,25 +87,25 @@ object DataApiHomeWorkTaxi extends App {
     spark.close()
   }
 
-  case class TaxiFacts(
-                        VendorID: Int,
-                        tpep_pickup_datetime: Timestamp,
-                        tpep_dropoff_datetime: Timestamp,
-                        passenger_count: Int,
-                        trip_distance: Double,
-                        RatecodeID: Int,
-                        store_and_fwd_flag: String,
-                        PULocationID: Int,
-                        DOLocationID: Int,
-                        payment_type: Int,
-                        fare_amount: Double,
-                        extra: Double,
-                        mta_tax: Double,
-                        tip_amount: Double,
-                        tolls_amount: Double,
-                        improvement_surcharge: Double,
-                        total_amount: Double
-                      )
+  // case class TaxiFacts(
+  //     VendorID: Int,
+  //     tpep_pickup_datetime: Timestamp,
+  //     tpep_dropoff_datetime: Timestamp,
+  //     passenger_count: Int,
+  //     trip_distance: Double,
+  //     RatecodeID: Int,
+  //     store_and_fwd_flag: String,
+  //     PULocationID: Int,
+  //     DOLocationID: Int,
+  //     payment_type: Int,
+  //     fare_amount: Double,
+  //     extra: Double,
+  //     mta_tax: Double,
+  //     tip_amount: Double,
+  //     tolls_amount: Double,
+  //     improvement_surcharge: Double,
+  //     total_amount: Double
+  // )
 
   def orderDistribution(): Unit = {
 
@@ -116,6 +116,25 @@ object DataApiHomeWorkTaxi extends App {
     import spark.implicits._
 
     val taxiFactsDS = taxiFactsDF.as[TaxiFacts]
+
+    val tripsStats = taxiFactsDS.agg(
+      count("trip_distance").name("trips"),
+      avg("trip_distance").name("avg_dist"),
+      max("trip_distance").name("max_dist"),
+      min("trip_distance").name("min_dist"),
+      stddev("trip_distance").name("stddev_dist")
+    )
+
+    val opts = Map(
+      "url"      -> "jdbc:postgresql://localhost:5432/otus",
+      "dbtable"  -> "trip_stats",
+      "user"     -> "docker",
+      "password" -> "docker"
+    )
+    tripsStats.write.mode("overwrite").format("jdbc").options(opts).save()
+
+    val showDF = spark.read.format("jdbc").options(opts).load()
+    showDF.show()
 
     spark.close()
   }
@@ -128,10 +147,10 @@ object DataApiHomeWorkTaxi extends App {
     */
 
   // * 1. DataFrame: Какие районы самые популярные для заказов? Результат в Parquet.
-  // mostPopular()
+  mostPopular()
 
   // * 2. RDD: В какое время происходит больше всего вызовов? Результат в txt файл c пробелами.
-  // timeOfMostRequests()
+  timeOfMostRequests()
 
   // * 3. DataSet: Как происходит распределение заказов? Результат записать в базу данных Postgres.
   orderDistribution()
