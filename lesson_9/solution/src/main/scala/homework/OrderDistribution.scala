@@ -1,11 +1,9 @@
-package lesson
+package homework
 
-import org.apache.spark.sql.{DataFrame, Dataset, KeyValueGroupedDataset, RelationalGroupedDataset, SparkSession}
-import org.apache.spark.sql.functions.{avg, col, count, max, min, stddev}
+import org.apache.spark.sql.functions._
+import org.apache.spark.sql.{DataFrame, SparkSession}
 
-import java.io.{File, FileInputStream}
 import java.sql.Timestamp
-import java.util.Properties
 
 object OrderDistribution extends App {
 
