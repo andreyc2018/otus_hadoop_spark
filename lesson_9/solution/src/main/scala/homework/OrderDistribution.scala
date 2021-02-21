@@ -3,7 +3,9 @@ package homework
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
+import java.io.{File, FileInputStream}
 import java.sql.Timestamp
+import java.util.Properties
 
 object OrderDistribution extends App {
 
@@ -58,27 +60,35 @@ object OrderDistribution extends App {
     min("trip_distance").name("min_dist"),
     stddev("trip_distance").name("stddev_dist")
   )
-//  taxiStatsDS.printSchema()
   tripsStats.show()
 
-  val opts = Map(
-    "url"      -> "jdbc:postgresql://localhost:5432/otus",
-    "dbtable"  -> "trip_stats",
-    "user"     -> "docker",
-    "password" -> "docker"
-  )
+  // The following if/else does the same using conf file approach and inline Map approach
+  // The conf file is more usefull because all parameters are defined outside of the source code.
+  val useDbConf = false
+  if (useDbConf) {
+    val dbProperties = new Properties
+    val confFile = "src/main/resources/db-properties.flat"
+    dbProperties.load(new FileInputStream(new File(confFile)));
+    val jdbcUrl = dbProperties.getProperty("jdbcUrl")
+    val where = "trip_stats"
+    tripsStats.write.mode("overwrite").jdbc(jdbcUrl, where, dbProperties)
+    val showDF = sparkSession.read.jdbc(jdbcUrl, where, dbProperties)
+    showDF.show()
+  }
+  else {
+    val opts = Map(
+      "url"      -> "jdbc:postgresql://localhost:5432/otus",
+      "dbtable"  -> "trip_stats",
+      "user"     -> "docker",
+      "password" -> "docker"
+    )
+    tripsStats.write.mode("overwrite").format("jdbc").options(opts).save()
 
-//  val dbProperties = new Properties
-//  val confFile = "src/main/resources/db-properties.flat"
-//  dbProperties.load(new FileInputStream(new File(confFile)));
-//  val jdbcUrl = dbProperties.getProperty("jdbcUrl")
-//  val where = "trip_stats"
-//  tripsStats.write.mode("append").jdbc(jdbcUrl, where, dbProperties)
+    val showDF = sparkSession.read.format("jdbc").options(opts).load()
+    showDF.show()
+  }
 
-  tripsStats.write.mode("append").format("jdbc").options(opts).save()
 
-//  val showDF = sparkSession.read.jdbc(jdbcUrl, where, dbProperties)
-//  showDF.show()
 
   //  val perHourDS = taxiFactsDS
 //    .groupByKey(d => d.tpep_pickup_datetime.getHours)
