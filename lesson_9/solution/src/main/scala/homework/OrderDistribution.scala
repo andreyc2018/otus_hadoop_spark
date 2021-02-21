@@ -67,7 +67,7 @@ object OrderDistribution extends App {
   val useDbConf = false
   if (useDbConf) {
     val dbProperties = new Properties
-    val confFile = "src/main/resources/db-properties.flat"
+    val confFile = "src/main/resources/db-properties.conf"
     dbProperties.load(new FileInputStream(new File(confFile)));
     val jdbcUrl = dbProperties.getProperty("jdbcUrl")
     val where = "trip_stats"
