@@ -87,38 +87,37 @@ object DataApiHomeWorkTaxi extends App {
     spark.close()
   }
 
-  // case class TaxiFacts(
-  //     VendorID: Int,
-  //     tpep_pickup_datetime: Timestamp,
-  //     tpep_dropoff_datetime: Timestamp,
-  //     passenger_count: Int,
-  //     trip_distance: Double,
-  //     RatecodeID: Int,
-  //     store_and_fwd_flag: String,
-  //     PULocationID: Int,
-  //     DOLocationID: Int,
-  //     payment_type: Int,
-  //     fare_amount: Double,
-  //     extra: Double,
-  //     mta_tax: Double,
-  //     tip_amount: Double,
-  //     tolls_amount: Double,
-  //     improvement_surcharge: Double,
-  //     total_amount: Double,
-  //     Hour: Int
-  // )
+//   case class TaxiFacts(
+//       VendorID: Int,
+//       tpep_pickup_datetime: Timestamp,
+//       tpep_dropoff_datetime: Timestamp,
+//       passenger_count: Int,
+//       trip_distance: Double,
+//       RatecodeID: Int,
+//       store_and_fwd_flag: String,
+//       PULocationID: Int,
+//       DOLocationID: Int,
+//       payment_type: Int,
+//       fare_amount: Double,
+//       extra: Double,
+//       mta_tax: Double,
+//       tip_amount: Double,
+//       tolls_amount: Double,
+//       improvement_surcharge: Double,
+//       total_amount: Double,
+//       Hour: Int
+//   )
 
   def orderDistribution(): Unit = {
 
     println("DataSet: Как происходит распределение заказов?")
     val spark = init()
 
-    val tsHour: (Timestamp) => Int = (ts: Timestamp) => { ts.getHours }
-
-    val tsHourUDF = udf(tsHour)
-
     val taxiFactsDF = spark.read
       .load("src/main/resources/data/yellow_taxi_jan_25_2018")
+
+    val tsHour: (Timestamp) => Int = (ts: Timestamp) => { ts.getHours }
+    val tsHourUDF = udf(tsHour)
     val withHour = taxiFactsDF
       .withColumn("Hour", tsHourUDF(taxiFactsDF.col("tpep_pickup_datetime")))
 
