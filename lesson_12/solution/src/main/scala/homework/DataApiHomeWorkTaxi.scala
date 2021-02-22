@@ -44,9 +44,9 @@ object DataApiHomeWorkTaxi extends App {
     Пример src/test/scala/lesson2/TestSharedSparkSession.scala
   */
 
-  MostPopularRDD.run()
+  MostPopularDF.run()
 
-  TimeOfMostRequestsDF.run()
+  TimeOfMostRequestsRDD.run()
 
   OrderDistributionDS.run()
 }

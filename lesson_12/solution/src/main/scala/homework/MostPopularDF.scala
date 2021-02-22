@@ -3,7 +3,7 @@ package homework
 import homework.DataApiHomeWorkTaxi.{init, readInfo, readStats, taxiFactsFile, taxiInfoFile}
 import org.apache.spark.sql.functions.col
 
-object MostPopularRDD {
+object MostPopularDF {
 
   def run(): Unit = {
 
