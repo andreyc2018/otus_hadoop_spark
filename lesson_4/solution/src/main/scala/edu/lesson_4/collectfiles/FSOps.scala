@@ -1,4 +1,4 @@
-package edu.lesson_3.collectfiles
+package edu.lesson_4.collectfiles
 
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{FileStatus, FileSystem, GlobFilter, Path}

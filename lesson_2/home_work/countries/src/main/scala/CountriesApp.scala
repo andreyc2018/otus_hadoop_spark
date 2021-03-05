@@ -47,7 +47,7 @@ object CountriesApp extends App {
     )
   }
 
-  def writeToFile(fileName: String, region: String, count: Int) = {
+  def writeToFile(fileName: String, region: String, count: Int): Unit = {
     val countries: Seq[Country] = filterRecords(region, count)(countriesList)
     val dataToWrite: JsValue = convertCountiesToJson(countries)
 
@@ -57,21 +57,12 @@ object CountriesApp extends App {
     writer.close()
   }
 
-  def writeToHdfs(uri: String, filePath: String, data: Array[Byte]) = {
-    System.setProperty("HADOOP_USER_NAME", "User")
-    val path = new Path(filePath)
-    val conf = new Configuration()
-    conf.set("fs.defaultFS", uri)
-    val fs = FileSystem.get(conf)
-    val os = fs.create(path)
-    os.write(data)
-    fs.close()
+  if (args.length == 0) {
+    println("output filename is required")
+    System.exit(0)
   }
 
   val outFile = args(0)
 
-  println("Trying to write to HDFS")
-  writeToHdfs("hdfs://192.168.44.201:9867/", "test.txt", "Hello World".getBytes)
-  println("Trying to write to local fs")
   writeToFile(outFile, "Africa", 10)
 }
