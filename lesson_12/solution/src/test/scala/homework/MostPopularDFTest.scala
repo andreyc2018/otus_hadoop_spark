@@ -6,9 +6,10 @@ import org.apache.spark.sql.test.SharedSparkSession
 import org.apache.spark.sql.{Row, SQLContext, SQLImplicits, SparkSession}
 import org.scalatest.funsuite.AnyFunSuite
 
-class MostPopularDFTest extends QueryTest
-  with SharedSparkSession {
+class SharedTest extends SharedSparkSession {
   import testImplicits._
 
-  test("join - processTaxiData") {}
+  test("join - processTaxiData") {
+
+  }
 }
