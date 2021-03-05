@@ -3,9 +3,6 @@ lesson_9
 lesson_11
 lesson_16
 
-# lesson 12 ignores
-lesson_12/solution/src/main/resources/data/**
-
 # examples that don't need to be in the repo
 example_repos/**
 **/most_popular_pu_location/**

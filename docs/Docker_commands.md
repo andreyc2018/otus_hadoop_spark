@@ -8,6 +8,8 @@ The container config files are in
     docker ps -a
 ### Inspect container
     docker inspect <container id | name>
+### Attach shell to running container
+    docker exec -it <container id> bash
 
 ## Disable auto-restart
     docker update --restart=no <name> ...
