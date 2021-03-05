@@ -16,7 +16,6 @@ resolvers ++= Seq(
   "MavenRepository" at "https://mvnrepository.com"
 )
 
-
 scalacOptions += "-deprecation"
 
 libraryDependencies ++= Seq(

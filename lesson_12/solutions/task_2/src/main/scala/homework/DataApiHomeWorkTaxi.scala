@@ -29,19 +29,10 @@ object DataApiHomeWorkTaxi extends App {
 
   /*
   # Домашнее задание
-  ## Основная инструкция задание 1:
-    Логически разбить на методы, написанный в домашнем задании к занятию Spark Data API.
-    Пример src/main/scala/lesson2/OtusFragmentedByMethod.scala
-
   ## Основная инструкция задание 2:
     Сформировать ожидаемый результат и покрыть простым тестом (с библиотекой AnyFlatSpec)
     витрину из домашнего задания к занятию Spark Data API, построенную с помощью RDD.
     Пример src/test/scala/lesson2/SimpleUnitTest.scala
-
-  ## Основная инструкция задание 3:
-    Сформировать ожидаемый результат и покрыть Spark тестом (с библиотекой SharedSparkSession)
-    витрину из домашнего задания к занятию Spark Data API, построенную с помощью DF и DS.
-    Пример src/test/scala/lesson2/TestSharedSparkSession.scala
   */
 
   MostPopularDF.run()
