@@ -6,6 +6,9 @@ lesson_12
 # examples that don't need to be in the repo
 example_repos/**
 **/most_popular_pu_location/**
+**/times_of_most_requests/**
+taxi_info_1.csv
+taxi_info_small.csv
 
 ## various config dirs
 **/.bsp/
