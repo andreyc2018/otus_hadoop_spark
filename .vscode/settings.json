@@ -6,5 +6,6 @@
         "**/.bsp": true,
         "**/.idea": true,
         "**/.metals": true
-    }
+    },
+    "jupyter.jupyterServerType": "local"
 }
