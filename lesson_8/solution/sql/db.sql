@@ -11,4 +11,3 @@ CREATE TABLE trip_stats (
     min_dist    REAL,
     stddev_dist REAL
 );
-
