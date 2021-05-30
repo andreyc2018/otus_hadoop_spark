@@ -1,14 +1,9 @@
-# Lessons in progress
-#lesson_9
-#lesson_11
-#lesson_16
+# result files nd dirs
+**/most_popular_pu_location/**
+#**/times_of_most_requests/**
 
 # examples that don't need to be in the repo
 example_repos/**
-**/most_popular_pu_location/**
-**/times_of_most_requests/**
-taxi_info_1.csv
-taxi_info_small.csv
 
 ## various config dirs
 **/.bsp/

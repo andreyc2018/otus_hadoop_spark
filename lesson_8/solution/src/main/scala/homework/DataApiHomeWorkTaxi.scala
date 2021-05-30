@@ -10,12 +10,11 @@ object DataApiHomeWorkTaxi extends App {
 
   val taxiFactsFile      = "src/main/resources/data/yellow_taxi_jan_25_2018"
   val taxiInfoFile       = "src/main/resources/data/taxi_zones.csv"
-  val smallTaxiFactsFile = "src/main/resources/data/small_set"
 
   def init(): SparkSession = {
     SparkSession
       .builder()
-      .appName("Homework #9")
+      .appName("Homework #8")
       .config("spark.master", "local")
       .getOrCreate()
   }

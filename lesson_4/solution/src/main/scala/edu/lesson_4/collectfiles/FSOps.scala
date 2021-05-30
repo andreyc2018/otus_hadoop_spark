@@ -59,7 +59,7 @@ class FSOps(root: String) {
       }
     } while (numBytes > 0)
 
-    if (data.length > 0 && data.last != '\n') {
+    if (data.nonEmpty && data.last != '\n') {
       data += '\n'
     }
 

@@ -12,14 +12,14 @@ object FilesAggregator extends App {
   def collectData(filter: String)(file: FileStatus): FileData = {
     val srcFiles = fs_ops.listFiles(file.getPath, filter)
     val data = srcFiles.foldLeft(ArrayBuffer[Byte]()) { (data, f) => data ++= fs_ops.readFile(f.getPath) }
-    return FileData(file.getPath.getName, data.toArray)
+    FileData(file.getPath.getName, data.toArray)
   }
 
-  def writeData(file: String, data: Array[Byte]) = {
+  def writeData(file: String, data: Array[Byte]): Unit = {
     fs_ops.writeToFile(file, data)
   }
 
-  srcDirs.map(f => {
+  srcDirs.foreach(f => {
     val fileData = collectData("*.csv")(f)
     if (fileData.data.length > 0) {
       writeData("/ods/" + fileData.dir + "/part-0000.csv", fileData.data)
