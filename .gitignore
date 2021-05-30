@@ -1,6 +1,6 @@
 # result files nd dirs
 **/most_popular_pu_location/**
-#**/times_of_most_requests/**
+**/times_of_most_requests/**
 
 # examples that don't need to be in the repo
 example_repos/**
