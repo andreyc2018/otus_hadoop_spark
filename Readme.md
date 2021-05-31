@@ -6,4 +6,4 @@
 2. [HDFS](./hdfs)
 3. [RDD/Dataframe/Dataset](./rdd_dataframe_dataset)
 4. [Написание коннекторов для Spark](./spark_connector)
-
+5. [Тестирование приложений Spark](./spark_tests)
